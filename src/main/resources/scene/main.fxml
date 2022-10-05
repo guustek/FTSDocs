@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?><?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+    prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="ftsdocs.Controller">
+    <TextField fx:id="searchTextField" alignment="CENTER" />
+    <Button fx:id="searchButton" layoutX="149.0" layoutY="2.0" mnemonicParsing="false"
+        onMouseClicked="#onSearchButtonClick" text="Search" />
+    <Button fx:id="indexButton" layoutX="153.0" layoutY="42.0" mnemonicParsing="false"
+        onMouseClicked="#onIndexButtonClick" text="Index" />
+    <TextField fx:id="fileNameField" alignment="CENTER" editable="false" layoutY="42.0"
+        onMouseClicked="#onFileChooseAction" />
+    <ListView fx:id="resultListView" layoutX="328.0" layoutY="25.0" prefHeight="200.0" prefWidth="200.0" />
+</AnchorPane>

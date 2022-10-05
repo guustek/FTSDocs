@@ -7,8 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Scanner;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -46,12 +48,13 @@ public class Main {
                               2 - Index file
                               3 - Remove file
                               4 - Search
-                              5 - Quit
+                              5 - Run GUI
+                              6 - Quit
                             """);
             int input = scanner.nextInt();
             switch (input) {
                 case 1 -> {
-                    SolrDocumentList result = search("content:*");
+                    SolrDocumentList result = search("*");
                     if (result.isEmpty()) {
                         System.out.println("Not found");
                     }
@@ -74,7 +77,7 @@ public class Main {
                 case 4 -> {
                     System.out.println("Query: ");
                     String query = scanner.next();
-                    SolrDocumentList result = search("content:" + query);
+                    SolrDocumentList result = search(query);
                     if (result.isEmpty()) {
                         System.out.println("Not found");
                     }
@@ -84,7 +87,11 @@ public class Main {
                         }
                     }
                 }
-                case 5 -> run = false;
+                case 5 -> launchGui();
+                case 6 -> {
+                    run = false;
+                    Platform.exit();
+                }
                 default -> System.out.println("Invalid option: " + input);
             }
         }
@@ -92,17 +99,22 @@ public class Main {
         server.close();
     }
 
+    public static void launchGui() {
+        //Application.launch(FTSDocsApplication.class);
+        Thread guiThread = new Thread(() -> Application.launch(FTSDocsApplication.class));
+        guiThread.start();
+    }
 
-    private static void removeFile(String id) {
+
+    public static void removeFile(String id) {
         try {
             server.deleteById(id);
             server.commit();
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    private static void indexFile(String path) {
+    public static void indexFile(String path) {
         File file = new File(path);
         if (! file.exists() || file.isDirectory()) {
             System.out.println("File does not exist or is a directory: " + path);
@@ -128,14 +140,13 @@ public class Main {
         }
     }
 
-    private static SolrDocumentList search(String query) {
-        SolrQuery solrQuery = new SolrQuery(query);
+    public static SolrDocumentList search(String query) {
+        SolrQuery solrQuery = new SolrQuery("content:" + query);
         try {
             QueryResponse response = server.query(solrQuery);
             return response.getResults();
         } catch (Exception e) {
             System.out.println("Error in quering files");
-            e.printStackTrace();
         }
         return new SolrDocumentList();
     }

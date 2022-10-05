@@ -1,5 +1,6 @@
 plugins {
-    id("java")
+    application
+    id("org.openjfx.javafxplugin") version "0.0.13"
 }
 
 group = "ftsdocs"
@@ -17,6 +18,16 @@ dependencies {
     implementation("org.apache.solr:solr-core:9.0.0")
 }
 
-tasks.getByName<Test>("test") {
+javafx {
+    version = "17"
+    modules("javafx.controls", "javafx.fxml")
+//    configuration = "compileOnly"
+}
+
+application {
+    mainClass.set("ftsdocs.FTSDocsApplication")
+}
+
+tasks.test {
     useJUnitPlatform()
 }
