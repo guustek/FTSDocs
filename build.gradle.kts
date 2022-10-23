@@ -1,6 +1,13 @@
 plugins {
+    java
     application
     id("org.openjfx.javafxplugin") version "0.0.13"
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(19))
+    }
 }
 
 group = "ftsdocs"
@@ -19,7 +26,7 @@ dependencies {
 }
 
 javafx {
-    version = "17"
+    version = "19"
     modules("javafx.controls", "javafx.fxml")
 //    configuration = "compileOnly"
 }
