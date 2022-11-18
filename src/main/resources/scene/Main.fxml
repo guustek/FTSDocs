@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
+  <children>
+    <TableView fx:id="fileTable" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+      <columns>
+        <TableColumn prefWidth="100.0" text="Name" />
+        <TableColumn minWidth="-1.0" prefWidth="200.0" text="Path" />
+      </columns>
+    </TableView>
+    <Button fx:id="indexButton" layoutX="340.0" layoutY="32.0" mnemonicParsing="false" onMouseClicked="#indexButton_MouseClicked" text="Index" />
+      <Button  fx:id="searchButton" layoutX="408.0" layoutY="32.0" mnemonicParsing="false" onMouseClicked="#searchButton_MouseClicked" text="Search" />
+  </children>
+</AnchorPane>
