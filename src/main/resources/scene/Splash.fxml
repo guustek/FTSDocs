@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+  prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea">
+  <Label alignment="CENTER" layoutX="-7.0" style="-fx-background-color: white;"
+    text="Server is starting" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <font>
+      <Font size="48.0"/>
+    </font>
+  </Label>
+</AnchorPane>
