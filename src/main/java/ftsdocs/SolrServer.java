@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -15,7 +16,10 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrXmlConfig;
 
+@Slf4j
 public class SolrServer {
+
+    private static final String CORE_NAME = "core";
 
     private static final SolrServer INSTANCE = new SolrServer();
     private final EmbeddedSolrServer server;
@@ -23,11 +27,12 @@ public class SolrServer {
 
     private SolrServer() {
         try {
+            log.info("Starting Solr server");
             File resourceSolr = new File(getClass().getResource("/solr").toURI());
             this.coreContainer = new CoreContainer(
                     SolrXmlConfig.fromSolrHome(resourceSolr.toPath(), System.getProperties()));
             this.coreContainer.load();
-            this.server = new EmbeddedSolrServer(this.coreContainer, "test");
+            this.server = new EmbeddedSolrServer(this.coreContainer, CORE_NAME);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
