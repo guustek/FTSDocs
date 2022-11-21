@@ -2,6 +2,8 @@ package ftsdocs;
 
 import java.io.IOException;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -9,7 +11,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class FTSDocsApplication extends Application {
 
     private SolrServer server;
@@ -45,9 +49,9 @@ public class FTSDocsApplication extends Application {
             server = task.getValue();
             showScene("Main.fxml");
             long time = System.currentTimeMillis() - start;
-            System.out.println(time / 1000);
+            log.info("Server started in {} seconds", time / 1000);
         });
-        Thread thread = new Thread(task);
+        Thread thread = new Thread(task, "Solr initialization thread");
         thread.start();
     }
 

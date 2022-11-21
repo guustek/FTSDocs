@@ -9,7 +9,7 @@
     <str name="class">org.apache.solr.logging.log4j.Log4jWatcher</str>
     <watcher>
       <int name="size">100</int>
-      <str name="threshold">INFO</str>
+      <str name="threshold">WARN</str>
     </watcher>
   </logging>
 </solr>

@@ -3,8 +3,7 @@
 
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
-    <fieldType name="long" class="solr.LongPointField" positionIncrementGap="0" docValues="true"
-      precisionStep="0"/>
+    <fieldType name="long" class="solr.LongPointField" docValues="true"/>
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -22,17 +21,20 @@
   </types>
 
   <fields>
-    <field name="_version_" type="long" indexed="false" stored="false"/>
-    <field name="id" type="string" multiValued="false" indexed="true" required="true"
+    <field name="path" type="string" multiValued="false" indexed="true" required="true"
       stored="true"/>
     <field name="content" type="text_general" termVectors="true" termPositions="true"
       termOffsets="true"/>
-    <field name="file_size" type="string" multiValued="false" indexed="false" required="false"
+    <field name="fileSize" type="string" multiValued="false" indexed="false" required="false"
       stored="true"/>
-    <field name="creation_time" type="string" multiValued="false" indexed="false" required="false"
+    <field name="extension" type="string" multiValued="false" indexed="true" required="false"
       stored="true"/>
+    <field name="creationTime" type="string" multiValued="false" indexed="false" required="false"
+      stored="true"/>
+
+    <field name="_version_" type="long" indexed="false" stored="false"/>
   </fields>
 
-  <uniqueKey>id</uniqueKey>
+  <uniqueKey>path</uniqueKey>
 
 </schema>
