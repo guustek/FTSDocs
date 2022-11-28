@@ -2,8 +2,6 @@ package ftsdocs;
 
 import java.io.IOException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -31,7 +29,7 @@ public class FTSDocsApplication extends Application {
         stage.setTitle("FTS Docs");
         Platform.setImplicitExit(true);
 
-        Parent splash = FXMLLoader.load(getClass().getResource("/scene/Splash.fxml"));
+        Parent splash = FXMLLoader.load(getClass().getResource("/view/splash.fxml"));
         Scene splashScene = new Scene(splash);
         stage.setScene(splashScene);
         stage.show();
@@ -47,7 +45,7 @@ public class FTSDocsApplication extends Application {
         };
         task.setOnSucceeded(event -> {
             server = task.getValue();
-            showScene("Main.fxml");
+            showScene("main.fxml");
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", time / 1000);
         });
@@ -57,7 +55,7 @@ public class FTSDocsApplication extends Application {
 
     private void showScene(String sceneName) {
         try {
-            Parent main = FXMLLoader.load(getClass().getResource("/scene/" + sceneName));
+            Parent main = FXMLLoader.load(getClass().getResource("/view/" + sceneName));
             Scene scene = new Scene(main);
             stage.setScene(scene);
         } catch (IOException e) {

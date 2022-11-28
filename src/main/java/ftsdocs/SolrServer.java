@@ -2,12 +2,12 @@ package ftsdocs;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -16,7 +16,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrXmlConfig;
 
-import lombok.extern.slf4j.Slf4j;
+import ftsdocs.model.Document;
+import ftsdocs.model.Document.FieldName;
 
 @Slf4j
 public class SolrServer {
@@ -36,7 +37,7 @@ public class SolrServer {
             this.coreContainer.load();
             this.server = new EmbeddedSolrServer(this.coreContainer, CORE_NAME);
             log.info("Solr server initialized");
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             log.error("Error while initializing Solr server", e);
             throw new RuntimeException(e);
         }
@@ -75,15 +76,16 @@ public class SolrServer {
             SolrInputDocument document = new SolrInputDocument();
             BasicFileAttributes attributes = Files.readAttributes(file.toPath(),
                     BasicFileAttributes.class);
-            document.addField("path", file.getAbsolutePath());
-            document.addField("creationTime", attributes.creationTime().toString());
-            document.addField("fileSize", attributes.size());
+            document.addField(FieldName.PATH, file.getAbsolutePath());
+            document.addField(FieldName.CREATION_TIME, attributes.creationTime().toString());
+            document.addField(FieldName.LAST_MODIFICATION_TIME, attributes.lastModifiedTime().toString());
+            document.addField(FieldName.FILE_SIZE, attributes.size());
             int p = file.getName().lastIndexOf(".");
             if (p > 0) {
                 String extension = file.getName().substring(p + 1);
-                document.addField("extension", extension);
+                document.addField(FieldName.EXTENSION, extension);
             }
-            document.addField("content", Files.readString(file.toPath()));
+            document.addField(FieldName.CONTENT, Files.readString(file.toPath()));
             log.info("Indexing document: \n {}", GsonUtils.toUnescapedWhiteSpacesJson(document));
             this.server.add(document);
             this.server.commit();

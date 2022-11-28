@@ -6,7 +6,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(19))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -38,7 +38,7 @@ dependencies {
 }
 
 javafx {
-    version = "19"
+    version = "17"
     modules("javafx.controls", "javafx.fxml")
 //    configuration = "compileOnly"
 }
