@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import ftsdocs.ContentExtractorService;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,11 +18,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 
 import ftsdocs.SolrServer;
 import ftsdocs.model.Document;
+import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
+@Component
 public class MainController implements Initializable {
 
     //region FXML fields
@@ -36,23 +41,28 @@ public class MainController implements Initializable {
     @FXML
     private TableView<Document> documentTable;
     @FXML
-    private TableColumn<Document,String> documentNameColumn;
+    private TableColumn<Document, String> documentNameColumn;
     @FXML
-    private TableColumn<Document,String> documentSizeColumn;
+    private TableColumn<Document, String> documentSizeColumn;
     @FXML
-    private TableColumn<Document,String> documentLastModificationTime;
+    private TableColumn<Document, String> documentLastModificationTime;
 
     //endregion
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
+
+    private final ContentExtractorService extractor;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         documentTable.setItems(documents);
         documentTable.setEditable(false);
         documentNameColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().path()));
-        documentSizeColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(FileUtils.byteCountToDisplaySize(c.getValue().fileSize())));
-        documentLastModificationTime.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().modificationTime()));
+        documentSizeColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(
+                FileUtils.byteCountToDisplaySize(c.getValue().fileSize())));
+        documentLastModificationTime.setCellValueFactory(
+                c -> new ReadOnlyStringWrapper(c.getValue().modificationTime()));
     }
 
     @FXML

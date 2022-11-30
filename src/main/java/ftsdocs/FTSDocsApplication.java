@@ -10,29 +10,38 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 @Slf4j
+@Configuration
+@ComponentScan
 public class FTSDocsApplication extends Application {
 
+    private ConfigurableApplicationContext context;
     private SolrServer server;
     private Stage stage;
 
     public static void main(String[] args) {
-        launch(args);
+       launch(args);
+    }
+
+    @Override
+    public void init() {
+        this.context = new AnnotationConfigApplicationContext(getClass());
+        String[] beans = this.context.getBeanDefinitionNames();
+        log.info("Registered spring beans {}", GsonUtils.toJson(beans));
     }
 
     @Override
     public void start(Stage primaryStage) throws IOException, InterruptedException {
-        initializeServer();
-
-        stage = primaryStage;
-        stage.setTitle("FTS Docs");
         Platform.setImplicitExit(true);
-
-        Parent splash = FXMLLoader.load(getClass().getResource("/view/splash.fxml"));
-        Scene splashScene = new Scene(splash);
-        stage.setScene(splashScene);
-        stage.show();
+        this.stage = primaryStage;
+        this.stage.setTitle("FTS Docs");
+        changeView("splash.fxml");
+        initializeServer();
     }
 
     private void initializeServer() {
@@ -44,8 +53,8 @@ public class FTSDocsApplication extends Application {
             }
         };
         task.setOnSucceeded(event -> {
-            server = task.getValue();
-            showScene("main.fxml");
+            this.server = task.getValue();
+            changeView("main.fxml");
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", time / 1000);
         });
@@ -53,13 +62,15 @@ public class FTSDocsApplication extends Application {
         thread.start();
     }
 
-    private void showScene(String sceneName) {
+    private void changeView(String view) {
         try {
-            Parent main = FXMLLoader.load(getClass().getResource("/view/" + sceneName));
-            Scene scene = new Scene(main);
-            stage.setScene(scene);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/" + view));
+            loader.setControllerFactory(this.context::getBean);
+            Parent root = loader.load();
+            this.stage.setScene(new Scene(root));
+            this.stage.show();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Error while changing view", e);
         }
     }
 
@@ -69,6 +80,9 @@ public class FTSDocsApplication extends Application {
             server.stop();
         }
         stage.hide();
+        context.close();
+        Platform.exit();
         System.exit(0);
     }
+
 }
