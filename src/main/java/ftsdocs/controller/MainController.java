@@ -15,12 +15,16 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -58,6 +62,7 @@ public class MainController implements Initializable {
 
     private final SolrService solrService;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         documentTable.setItems(documents);
@@ -78,6 +83,7 @@ public class MainController implements Initializable {
         }
         Collection<Document> result = solrService.searchDocuments(query);
         documents.setAll(result);
+        mouseEvent.consume();
     }
 
     @FXML

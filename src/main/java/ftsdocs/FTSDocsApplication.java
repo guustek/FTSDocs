@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.JMetroStyleClass;
 import jfxtras.styles.jmetro.Style;
@@ -35,7 +36,7 @@ public class FTSDocsApplication extends Application {
 
     @Override
     public void init() {
-        this.jmetro = new JMetro(Style.DARK);
+        this.jmetro = new JMetro(Style.LIGHT);
         this.context = new AnnotationConfigApplicationContext(getClass());
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", GsonUtils.toJson(beans));
@@ -43,9 +44,9 @@ public class FTSDocsApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, InterruptedException {
-        Platform.setImplicitExit(true);
         this.stage = primaryStage;
         this.stage.setTitle("FTS Docs");
+        this.stage.initStyle(StageStyle.UNDECORATED);
         changeScene("splash.fxml");
         startSolrServer();
     }
@@ -60,7 +61,11 @@ public class FTSDocsApplication extends Application {
         };
         task.setOnSucceeded(event -> {
             this.server = task.getValue();
+            var splashStage = this.stage;
+            this.stage = new Stage();
+            this.stage.initStyle(StageStyle.DECORATED);
             changeScene("main.fxml");
+            splashStage.close();
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", (double) time / 1000);
         });
@@ -76,6 +81,7 @@ public class FTSDocsApplication extends Application {
             Scene scene = new Scene(root);
             jmetro.setScene(scene);
             this.stage.setScene(scene);
+            this.stage.centerOnScreen();
             this.stage.show();
         } catch (IOException e) {
             log.error("Error while changing view", e);

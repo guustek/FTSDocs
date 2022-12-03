@@ -21,6 +21,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 
+    implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.19.0")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
     implementation("org.apache.logging.log4j:log4j-api:2.19.0")
     implementation("org.apache.logging.log4j:log4j-core:2.19.0")
@@ -36,6 +37,7 @@ dependencies {
 
     implementation("org.springframework:spring-context:6.0.2")
     implementation ("org.apache.tika:tika-core:2.6.0")
+    implementation ("org.apache.tika:tika-parsers-standard-package:2.6.0")
     implementation ("org.jfxtras:jmetro:11.6.14")
 }
 
