@@ -6,9 +6,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0" minWidth="0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0" minWidth="0" prefHeight="600.0" prefWidth="800.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
   <left>
-    <VBox spacing="20.0" BorderPane.alignment="CENTER">
+    <VBox spacing="20.0" styleClass="background" BorderPane.alignment="CENTER">
       <HBox alignment="CENTER">
         <VBox.margin>
           <Insets />
@@ -33,7 +33,7 @@
           </VBox.margin>
         </Label>
       </HBox>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Home">
+      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Home">
         <VBox.margin>
           <Insets left="1.0" />
         </VBox.margin>
@@ -46,7 +46,7 @@
           </ImageView>
         </graphic>
       </Button>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Indexed files">
+      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Indexed files">
         <VBox.margin>
           <Insets />
         </VBox.margin>
@@ -59,7 +59,7 @@
           </ImageView>
         </graphic>
       </Button>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Settings">
+      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Settings">
         <font>
           <Font size="14.0" />
         </font>
@@ -81,7 +81,7 @@
     </VBox>
   </left>
   <center>
-    <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+    <VBox prefHeight="200.0" prefWidth="100.0" styleClass="background" BorderPane.alignment="CENTER">
       <Label style="-fx-font-weight: bold;" text="Home">
         <font>
           <Font size="20.0" />
@@ -94,7 +94,7 @@
         <VBox.margin>
           <Insets bottom="10.0" top="10.0" />
         </VBox.margin>
-        <Button fx:id="searchButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#searchButtonClicked">
+        <Button fx:id="searchButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#searchButtonClicked" style="-fx-background-color: transparent;">
           <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
               <Image url="@../icon/search_icon.png" />
@@ -110,7 +110,7 @@
           </HBox.margin>
         </TextField>
       </HBox>
-      <TableView fx:id="documentTable">
+      <TableView fx:id="documentTable" VBox.vgrow="ALWAYS">
         <VBox.margin>
           <Insets />
         </VBox.margin>

@@ -31,7 +31,7 @@
       stored="true"/>
     <field name="creationTime" type="string" multiValued="false" indexed="false" required="false"
       stored="true"/>
-    <field name="lastModificationTime" type="string" multiValued="false" indexed="false" required="false"
+    <field name="lastModifiedTime" type="string" multiValued="false" indexed="false" required="false"
       stored="true"/>
 
     <field name="_version_" type="long" indexed="false" stored="false"/>

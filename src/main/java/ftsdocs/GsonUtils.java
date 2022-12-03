@@ -8,7 +8,7 @@ public class GsonUtils {
     private GsonUtils() {
     }
 
-    public static final Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .create();

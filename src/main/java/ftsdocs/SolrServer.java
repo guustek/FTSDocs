@@ -2,29 +2,18 @@ package ftsdocs;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
-import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrXmlConfig;
-
-import ftsdocs.model.Document;
-import ftsdocs.model.Document.FieldName;
 
 @Slf4j
 public class SolrServer {
 
+    private static SolrServer instance;
     private static final String CORE_NAME = "core";
-
-    private static final SolrServer INSTANCE = new SolrServer();
     private final EmbeddedSolrServer server;
     private final CoreContainer coreContainer;
 
@@ -42,70 +31,11 @@ public class SolrServer {
             throw new RuntimeException(e);
         }
     }
-
-    public static SolrServer getInstance() {
-        return INSTANCE;
-    }
-
-    public void removeAllFiles() {
-        try {
-            this.server.deleteByQuery("*:*");
-            this.server.commit();
-        } catch (SolrServerException | IOException e) {
-            log.error("Error while removing all files", e);
+    public static SolrServer getServer(){
+        if(instance == null){
+            instance = new SolrServer();
         }
-    }
-
-    public void removeFile(String id) {
-        try {
-            this.server.deleteById(id);
-            this.server.commit();
-        } catch (SolrServerException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void indexFile(String path) {
-        File file = new File(path);
-        if (!file.exists() || file.isDirectory()) {
-            log.info("File does not exist or is a directory: {}", path);
-            return;
-        }
-        try {
-            SolrInputDocument document = new SolrInputDocument();
-            BasicFileAttributes attributes = Files.readAttributes(file.toPath(),
-                    BasicFileAttributes.class);
-            document.addField(FieldName.PATH, file.getAbsolutePath());
-            document.addField(FieldName.CREATION_TIME, attributes.creationTime().toString());
-            document.addField(FieldName.LAST_MODIFICATION_TIME, attributes.lastModifiedTime().toString());
-            document.addField(FieldName.FILE_SIZE, attributes.size());
-            int p = file.getName().lastIndexOf(".");
-            if (p > 0) {
-                String extension = file.getName().substring(p + 1);
-                document.addField(FieldName.EXTENSION, extension);
-            }
-            document.addField(FieldName.CONTENT, Files.readString(file.toPath()));
-            log.info("Indexing document: \n {}", GsonUtils.toUnescapedWhiteSpacesJson(document));
-            this.server.add(document);
-            this.server.commit();
-        } catch (Exception e) {
-            log.error("Error while indexing file {}: ", file.getAbsolutePath(), e);
-        }
-    }
-
-    public List<Document> search(String query) {
-        SolrQuery solrQuery = new SolrQuery("content:" + query);
-        try {
-            log.info("Searching for documents, query: {}", solrQuery);
-            QueryResponse response = this.server.query(solrQuery);
-            log.info("Found documents: \n {}",
-                    GsonUtils.toUnescapedWhiteSpacesJson(response.getResults()));
-            return response.getResults().stream().map(Document::fromSolrDocument).toList();
-        } catch (Exception e) {
-            log.error("Error while searching for documents, query {}", solrQuery, e);
-        }
-        return Collections.emptyList();
+        return instance;
     }
 
     public void stop() throws IOException {
@@ -113,5 +43,9 @@ public class SolrServer {
         this.coreContainer.shutdown();
         this.server.close();
         log.info("Core container and server closed");
+    }
+
+    public SolrClient getClient() {
+        return server;
     }
 }

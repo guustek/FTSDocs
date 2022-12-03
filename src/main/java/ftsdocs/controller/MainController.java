@@ -1,11 +1,14 @@
 package ftsdocs.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import ftsdocs.ContentExtractorService;
+import ftsdocs.SolrService;
+import ftsdocs.model.Document;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,21 +19,23 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
-
-import ftsdocs.SolrServer;
-import ftsdocs.model.Document;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Lazy
 public class MainController implements Initializable {
 
     //region FXML fields
 
+    @FXML
+    private BorderPane root;
     @FXML
     private TextField searchTextField;
     @FXML
@@ -51,8 +56,7 @@ public class MainController implements Initializable {
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
 
-    private final ContentExtractorService extractor;
-
+    private final SolrService solrService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,25 +66,28 @@ public class MainController implements Initializable {
         documentSizeColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(
                 FileUtils.byteCountToDisplaySize(c.getValue().fileSize())));
         documentLastModificationTime.setCellValueFactory(
-                c -> new ReadOnlyStringWrapper(c.getValue().modificationTime()));
+                c -> new ReadOnlyStringWrapper(c.getValue().lastModifiedTime()));
     }
 
     @FXML
-    private void searchButtonClicked(MouseEvent mouseEvent) {
+    private void searchButtonClicked(MouseEvent mouseEvent)
+            throws SolrServerException, IOException {
         String query = searchTextField.getText();
-        if (query == null || query.isEmpty()) {
+        if (query.isBlank()) {
             query = "*";
         }
-        List<Document> result = SolrServer.getInstance().search(query);
+        Collection<Document> result = solrService.searchDocuments(query);
         documents.setAll(result);
     }
 
     @FXML
-    private void indexButtonClicked(MouseEvent mouseEvent) {
+    private void indexButtonClicked(MouseEvent mouseEvent) throws IOException, SolrServerException {
         FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(indexButton.getScene().getWindow());
-        if (file != null && file.exists()) {
-            SolrServer.getInstance().indexFile(file.getPath());
+        List<File> files = fileChooser
+                .showOpenMultipleDialog(root.getScene().getWindow());
+        if (files != null) {
+            solrService.indexFiles(files);
         }
+
     }
 }

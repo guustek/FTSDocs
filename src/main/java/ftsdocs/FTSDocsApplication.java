@@ -9,7 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.JMetroStyleClass;
+import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,13 +27,15 @@ public class FTSDocsApplication extends Application {
     private ConfigurableApplicationContext context;
     private SolrServer server;
     private Stage stage;
+    private JMetro jmetro;
 
     public static void main(String[] args) {
-       launch(args);
+        launch(args);
     }
 
     @Override
     public void init() {
+        this.jmetro = new JMetro(Style.DARK);
         this.context = new AnnotationConfigApplicationContext(getClass());
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", GsonUtils.toJson(beans));
@@ -40,34 +46,36 @@ public class FTSDocsApplication extends Application {
         Platform.setImplicitExit(true);
         this.stage = primaryStage;
         this.stage.setTitle("FTS Docs");
-        changeView("splash.fxml");
-        initializeServer();
+        changeScene("splash.fxml");
+        startSolrServer();
     }
 
-    private void initializeServer() {
+    private void startSolrServer() {
         long start = System.currentTimeMillis();
         Task<SolrServer> task = new Task<>() {
             @Override
             protected SolrServer call() {
-                return SolrServer.getInstance();
+                return SolrServer.getServer();
             }
         };
         task.setOnSucceeded(event -> {
             this.server = task.getValue();
-            changeView("main.fxml");
+            changeScene("main.fxml");
             long time = System.currentTimeMillis() - start;
-            log.info("Server started in {} seconds", time / 1000);
+            log.info("Server started in {} seconds", (double) time / 1000);
         });
-        Thread thread = new Thread(task, "Solr initialization thread");
+        Thread thread = new Thread(task, "Solr startup thread");
         thread.start();
     }
 
-    private void changeView(String view) {
+    private void changeScene(String view) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/" + view));
             loader.setControllerFactory(this.context::getBean);
             Parent root = loader.load();
-            this.stage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            jmetro.setScene(scene);
+            this.stage.setScene(scene);
             this.stage.show();
         } catch (IOException e) {
             log.error("Error while changing view", e);
@@ -84,5 +92,4 @@ public class FTSDocsApplication extends Application {
         Platform.exit();
         System.exit(0);
     }
-
 }
