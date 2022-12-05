@@ -1,6 +1,7 @@
 package ftsdocs;
 
 import java.io.IOException;
+import java.time.Instant;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,10 +12,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.JMetroStyleClass;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.SolrClient;
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,6 +31,11 @@ public class FTSDocsApplication extends Application {
     private JMetro jmetro;
 
     public static void main(String[] args) {
+        log.info("Starting application at {} on host: {}",
+                DisplayUtils.dateTimeFormatter.format(Instant.now()), SystemUtils.getHostName());
+        log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
+        log.info("Working directory: {}", SystemUtils.getUserDir());
+        log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
         launch(args);
     }
 
@@ -39,7 +44,7 @@ public class FTSDocsApplication extends Application {
         this.jmetro = new JMetro(Style.LIGHT);
         this.context = new AnnotationConfigApplicationContext(getClass());
         String[] beans = this.context.getBeanDefinitionNames();
-        log.info("Registered spring beans {}", GsonUtils.toJson(beans));
+        log.info("Registered spring beans {}", DisplayUtils.toJson(beans));
     }
 
     @Override

@@ -26,9 +26,9 @@ import org.springframework.stereotype.Service;
 public class SolrService {
 
     private final SolrClient client;
-    private final ContentExtractorService contentExtractor;
+    private final ContentExtractor contentExtractor;
 
-    public SolrService(ContentExtractorService contentExtractor) {
+    public SolrService(ContentExtractor contentExtractor) {
         this.client = SolrServer.getServer().getClient();
         this.contentExtractor = contentExtractor;
     }
@@ -40,7 +40,7 @@ public class SolrService {
         List<Document> results = response.getResults().stream()
                 .map(Document::getDocumentFromSolrDocument)
                 .toList();
-        log.info("Found documents: {}", GsonUtils.toUnescapedWhiteSpacesJson(results));
+        log.info("Found documents: {}", DisplayUtils.toUnescapedWhiteSpacesJson(results));
         return results;
     }
 
@@ -55,7 +55,7 @@ public class SolrService {
                             .map(Document::getSolrInputDocument).toList();
                     client.add(documents);
                     client.commit();
-                    log.info("Successfully indexed documents: {}", GsonUtils.toJson(documents));
+                    log.info("Successfully indexed documents: {}", DisplayUtils.toJson(documents));
                 }
             } else if (file.isFile()) {
                 Document document = contentExtractor.getDocumentFromFile(file);
@@ -64,7 +64,7 @@ public class SolrService {
                     client.add(solrInputDocument);
                     client.commit();
                     log.info("Successfully indexed documents: {}",
-                            GsonUtils.toUnescapedWhiteSpacesJson(document));
+                            DisplayUtils.toUnescapedWhiteSpacesJson(document));
                 }
             }
         }

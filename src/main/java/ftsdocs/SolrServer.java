@@ -12,8 +12,8 @@ import org.apache.solr.core.SolrXmlConfig;
 @Slf4j
 public class SolrServer {
 
-    private static SolrServer instance;
     private static final String CORE_NAME = "core";
+    private static final SolrServer instance = new SolrServer();
     private final EmbeddedSolrServer server;
     private final CoreContainer coreContainer;
 
@@ -31,10 +31,8 @@ public class SolrServer {
             throw new RuntimeException(e);
         }
     }
-    public static SolrServer getServer(){
-        if(instance == null){
-            instance = new SolrServer();
-        }
+
+    public static SolrServer getServer() {
         return instance;
     }
 

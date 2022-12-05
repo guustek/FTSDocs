@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import ftsdocs.DisplayUtils;
 import ftsdocs.SolrService;
 import ftsdocs.model.Document;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -15,16 +16,12 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
-import jfxtras.styles.jmetro.MDL2IconFont;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -54,6 +51,8 @@ public class MainController implements Initializable {
     @FXML
     private TableColumn<Document, String> documentSizeColumn;
     @FXML
+    private TableColumn<Document, String> documentCreationTimeColumn;
+    @FXML
     private TableColumn<Document, String> documentLastModificationTime;
 
     //endregion
@@ -62,16 +61,20 @@ public class MainController implements Initializable {
 
     private final SolrService solrService;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         documentTable.setItems(documents);
         documentTable.setEditable(false);
         documentNameColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().path()));
-        documentSizeColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(
-                FileUtils.byteCountToDisplaySize(c.getValue().fileSize())));
-        documentLastModificationTime.setCellValueFactory(
-                c -> new ReadOnlyStringWrapper(c.getValue().lastModifiedTime()));
+        documentSizeColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        FileUtils.byteCountToDisplaySize(c.getValue().fileSize())));
+        documentCreationTimeColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        DisplayUtils.dateTimeFormatter.format(c.getValue().creationTime())));
+        documentLastModificationTime.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        DisplayUtils.dateTimeFormatter.format(c.getValue().lastModifiedTime())));
     }
 
     @FXML
@@ -83,7 +86,6 @@ public class MainController implements Initializable {
         }
         Collection<Document> result = solrService.searchDocuments(query);
         documents.setAll(result);
-        mouseEvent.consume();
     }
 
     @FXML

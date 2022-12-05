@@ -33,7 +33,7 @@
           </VBox.margin>
         </Label>
       </HBox>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Home">
+      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Home">
         <VBox.margin>
           <Insets left="1.0" />
         </VBox.margin>
@@ -59,7 +59,7 @@
           </ImageView>
         </graphic>
       </Button>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Settings">
+      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: transparent;" text="Settings">
         <font>
           <Font size="14.0" />
         </font>
@@ -94,12 +94,11 @@
         <VBox.margin>
           <Insets bottom="10.0" top="10.0" />
         </VBox.margin>
-        <Button fx:id="searchButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#searchButtonClicked" style="-fx-background-color: transparent;">
+        <Button fx:id="searchButton" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#searchButtonClicked" style="-fx-background-color: transparent;">
           <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../icon/search_icon.png" />
-                     </image></ImageView>
+              <Image url="@../icon/search_icon.png" />
+            </ImageView>
           </graphic>
           <HBox.margin>
             <Insets />
@@ -118,11 +117,12 @@
         <columnResizePolicy>
           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
-            <columns>
-               <TableColumn fx:id="documentNameColumn" prefWidth="75.0" text="Name" />
-               <TableColumn fx:id="documentSizeColumn" prefWidth="75.0" text="Size" />
-               <TableColumn fx:id="documentLastModificationTime" prefWidth="75.0" text="Last modification" />
-            </columns>
+        <columns>
+          <TableColumn fx:id="documentNameColumn" prefWidth="75.0" text="Name" />
+          <TableColumn fx:id="documentSizeColumn" prefWidth="75.0" text="Size" />
+          <TableColumn fx:id="documentCreationTimeColumn" prefWidth="75.0" text="Creation time" />
+          <TableColumn fx:id="documentLastModificationTime" prefWidth="75.0" text="Last modification" />
+        </columns>
       </TableView>
       <BorderPane.margin>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
