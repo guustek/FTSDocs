@@ -31,16 +31,17 @@ public class FTSDocsApplication extends Application {
     private JMetro jmetro;
 
     public static void main(String[] args) {
-        log.info("Starting application at {} on host: {}",
-                DisplayUtils.dateTimeFormatter.format(Instant.now()), SystemUtils.getHostName());
-        log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
-        log.info("Working directory: {}", SystemUtils.getUserDir());
-        log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
         launch(args);
     }
 
     @Override
     public void init() {
+        log.info("Starting application at {} on host: {}",
+                DisplayUtils.dateTimeFormatter.format(Instant.now()), SystemUtils.getHostName());
+        log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
+        log.info("Working directory: {}", SystemUtils.getUserDir());
+        log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
+
         this.jmetro = new JMetro(Style.LIGHT);
         this.context = new AnnotationConfigApplicationContext(getClass());
         String[] beans = this.context.getBeanDefinitionNames();
@@ -55,6 +56,7 @@ public class FTSDocsApplication extends Application {
         changeScene("splash.fxml");
         startSolrServer();
     }
+
 
     private void startSolrServer() {
         long start = System.currentTimeMillis();
@@ -77,6 +79,7 @@ public class FTSDocsApplication extends Application {
         Thread thread = new Thread(task, "Solr startup thread");
         thread.start();
     }
+
 
     private void changeScene(String view) {
         try {

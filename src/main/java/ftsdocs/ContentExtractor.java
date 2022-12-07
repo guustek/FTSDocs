@@ -2,9 +2,9 @@ package ftsdocs;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.time.Instant;
+import java.util.Date;
 
 import ftsdocs.model.Document;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,11 @@ public class ContentExtractor {
 
     private String getContent(File file) throws Exception {
         try {
-            log.debug("Detected type for file {} : {}", file.getName(), tika.detect(file.getName()));
+            log.info("Detected type for file {} - {}", file.getName(), tika.detect(file.getName()));
+            if (file.length() == 0) {
+                log.info("Zero byte file - {}, returning empty content", file);
+                return "";
+            }
             return tika.parseToString(file);
         } catch (Exception e) {
             log.error("Error while extracting content from {}", file, e);
@@ -34,7 +38,7 @@ public class ContentExtractor {
 
     public Document getDocumentFromFile(File file) {
         if (!file.exists() || !file.isFile() || file.isDirectory()) {
-            log.error("File does not exist or is invalid: {}", file.getAbsolutePath());
+            log.error("File does not exist or is invalid: {}", file);
             return null;
         }
         try {
@@ -44,8 +48,8 @@ public class ContentExtractor {
             String content = getContent(file);
             long fileSize = fileAttributes.size();
             String extension = FilenameUtils.getExtension(file.getName());
-            Instant creationTime = fileAttributes.creationTime().toInstant();
-            Instant lastModifiedTime = fileAttributes.lastModifiedTime().toInstant();
+            var creationTime = Date.from(fileAttributes.creationTime().toInstant());
+            var lastModifiedTime = Date.from(fileAttributes.lastModifiedTime().toInstant());
             return new Document(path, content, fileSize, extension, creationTime, lastModifiedTime);
         } catch (Exception e) {
             log.error("Error while building document: {}", file, e);

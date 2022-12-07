@@ -25,7 +25,7 @@
   <fields>
     <field name="path" type="string" multiValued="false" indexed="true" required="true"
       stored="true"/>
-    <field name="content" type="text_general" termVectors="true" termPositions="true"
+    <field name="content" type="text_general" required="true" termVectors="true" termPositions="true"
       termOffsets="true"/>
     <field name="fileSize" type="long" multiValued="false" indexed="false" required="false"
       stored="true"/>
