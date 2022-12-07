@@ -2,10 +2,7 @@ package ftsdocs;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Instant;
-import java.util.Date;
 
-import ftsdocs.model.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
@@ -28,10 +25,10 @@ public class SolrServer {
                     SolrXmlConfig.fromSolrHome(resourceSolr.toPath(), System.getProperties()));
             this.coreContainer.load();
             this.server = new EmbeddedSolrServer(this.coreContainer, CORE_NAME);
-            this.server.deleteByQuery("*:*");
-            this.server.addBean(new Document("", "", Long.MAX_VALUE, "", Date.from(Instant.now()),
-                    Date.from(Instant.now())));
-            this.server.commit();
+//            this.server.deleteByQuery("*:*");
+//            this.server.addBean(new Document("", "", Long.MAX_VALUE, "", new Date(Long.MAX_VALUE),
+//                    new Date(Long.MIN_VALUE)));
+//            this.server.commit();
             log.info("Solr server initialized");
         } catch (Exception e) {
             log.error("Error while initializing Solr server", e);
