@@ -26,8 +26,6 @@ public class SolrServer {
             this.coreContainer.load();
             this.server = new EmbeddedSolrServer(this.coreContainer, CORE_NAME);
 //            this.server.deleteByQuery("*:*");
-//            this.server.addBean(new Document("", "", Long.MAX_VALUE, "", new Date(Long.MAX_VALUE),
-//                    new Date(Long.MIN_VALUE)));
 //            this.server.commit();
             log.info("Solr server initialized");
         } catch (Exception e) {

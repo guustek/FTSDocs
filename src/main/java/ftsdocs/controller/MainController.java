@@ -7,9 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import ftsdocs.DisplayUtils;
-import ftsdocs.SolrService;
-import ftsdocs.model.Document;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,14 +20,18 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import ftsdocs.DisplayUtils;
+import ftsdocs.SolrService;
+import ftsdocs.model.Document;
 
 @RequiredArgsConstructor
 @Component
@@ -44,13 +45,6 @@ public class MainController implements Initializable {
     @FXML
     private TextField searchTextField;
     @FXML
-    private Button searchButton;
-    @FXML
-    private Button indexFilesButton;
-    @FXML
-    private Button indexDirectoriesButton;
-
-    @FXML
     private TableView<Document> documentTable;
     @FXML
     private TableColumn<Document, String> documentNameColumn;
@@ -62,7 +56,7 @@ public class MainController implements Initializable {
     private TableColumn<Document, String> documentModificationTimeColumn;
 
     @FXML
-    private TextFlow textFlow;
+    private WebView documentContentArea;
     //endregion
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
@@ -72,28 +66,33 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        documentTable.setItems(documents);
-        documentTable.setEditable(false);
-        documentTable.setOnMouseClicked(event -> {
+        this.documentTable.setItems(documents);
+        this.documentTable.setEditable(false);
+        this.documentTable.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                String content = documentTable.getSelectionModel().getSelectedItem().getContent();
-                Text text = new Text(content);
-                text.wrappingWidthProperty().bind(textFlow.widthProperty().subtract(10));
-                textFlow.getChildren().clear();
-                textFlow.getChildren().add(text);
+                Document selectedDocument = this.documentTable.getSelectionModel()
+                        .getSelectedItem();
+                if (selectedDocument == null) {
+                    return;
+                }
+                String text = selectedDocument.getHighlight();
+                if (text == null) {
+                    text = selectedDocument.getContent();
+                }
+                this.documentContentArea.getEngine().loadContent("<pre>" + text + "</pre>");
             }
         });
-        documentNameColumn.prefWidthProperty().bind(getPathColumnSize());
-        documentNameColumn.setCellValueFactory(
+        this.documentNameColumn.prefWidthProperty().bind(getPathColumnSize());
+        this.documentNameColumn.setCellValueFactory(
                 c -> new ReadOnlyStringWrapper(c.getValue().getPath()));
-        documentSizeColumn.setCellValueFactory(c ->
+        this.documentSizeColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
                         FileUtils.byteCountToDisplaySize(c.getValue().getFileSize())));
-        documentCreationTimeColumn.setCellValueFactory(c ->
+        this.documentCreationTimeColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
                         DisplayUtils.dateTimeFormatter.format(
                                 c.getValue().getCreationTime().toInstant())));
-        documentModificationTimeColumn.setCellValueFactory(c ->
+        this.documentModificationTimeColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
                         DisplayUtils.dateTimeFormatter.format(
                                 c.getValue().getLastModifiedTime().toInstant())));
@@ -108,30 +107,31 @@ public class MainController implements Initializable {
 
     @FXML
     private void searchButtonClicked(MouseEvent mouseEvent) {
-        String query = searchTextField.getText();
+        String query = this.searchTextField.getText();
         if (query.isBlank()) {
             query = "*";
         }
-        Collection<Document> result = solrService.searchDocuments(query);
-        documents.setAll(result);
+        Collection<Document> result = this.solrService.searchDocuments(query);
+        this.documents.setAll(result);
+        this.documentContentArea.getEngine().loadContent("");
     }
 
     @FXML
     private void indexFilesButtonClicked(MouseEvent mouseEvent) {
         FileChooser chooser = new FileChooser();
         List<File> files = chooser
-                .showOpenMultipleDialog(root.getScene().getWindow());
+                .showOpenMultipleDialog(this.root.getScene().getWindow());
         if (files != null) {
-            solrService.indexFiles(files);
+            this.solrService.indexFiles(files);
         }
     }
 
     @FXML
     private void indexDirectoriesButtonClicked(MouseEvent mouseEvent) {
         DirectoryChooser chooser = new DirectoryChooser();
-        File directory = chooser.showDialog(root.getScene().getWindow());
+        File directory = chooser.showDialog(this.root.getScene().getWindow());
         if (directory != null) {
-            solrService.indexFiles(Collections.singletonList(directory));
+            this.solrService.indexFiles(Collections.singletonList(directory));
         }
     }
 }

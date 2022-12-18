@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -16,10 +17,9 @@ import ftsdocs.model.FieldName;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.params.CursorMarkParams;
+import org.apache.solr.common.params.CommonParams;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -37,31 +37,39 @@ public class SolrService {
     }
 
     public Collection<Document> searchDocuments(String query) {
-        List<Document> results = new LinkedList<>();
+        Collection<Document> documents = Collections.emptyList();
         SolrQuery solrQuery = new SolrQuery()
-                .setQuery(FieldName.CONTENT + ":" + query)
-                .setRows(Integer.MAX_VALUE)
-                .setSort(SortClause.asc(FieldName.PATH));
-        String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-        boolean isDone = false;
+                .setParam(CommonParams.DF, FieldName.CONTENT)
+                .setHighlight(true)
+                .setHighlightFragsize(100)
+                .setHighlightSnippets(Integer.MAX_VALUE - 1)
+                .setHighlightSimplePre("<b><FONT COLOR=\"RED\">")
+                .setHighlightSimplePost("</FONT></b>")
+                .setRows(100)
+                .setQuery(query);
         try {
-            while (!isDone) {
-                solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-                QueryResponse response = this.client.query(solrQuery);
-                String nextCursorMark = response.getNextCursorMark();
-                results.addAll(response.getBeans(Document.class));
-                if (cursorMark.equals(nextCursorMark)) {
-                    isDone = true;
-                }
-                cursorMark = nextCursorMark;
+            QueryResponse response = this.client.query(solrQuery);
+
+            documents = response.getBeans(Document.class);
+            Map<String, Map<String, List<String>>> highlighting = response.getHighlighting();
+
+            log.info("Found {} documents: {}", documents.size(),
+                    DisplayUtils.toJson(documents.stream().map(Document::getPath).toList()));
+            log.info("Found highlight: {}", DisplayUtils.toUnescapedWhiteSpacesJson(highlighting));
+
+            for (Document document : documents) {
+                Map<String, List<String>> highlightsForPath = highlighting.get(document.getPath());
+                List<String> highlightsForField = highlightsForPath.getOrDefault(FieldName.CONTENT,
+                        Collections.singletonList(null));
+                document.setHighlight(highlightsForField.get(0));
             }
+
+            return documents;
         } catch (Exception e) {
             log.error("Error while searching with query: {}",
-                    DisplayUtils.toJson(solrQuery.toString()));
+                    DisplayUtils.toJson(solrQuery.toString()), e);
         }
-        log.info("Found {} documents: {}", results.size(),
-                DisplayUtils.toUnescapedWhiteSpacesJson(results));
-        return results;
+        return documents;
     }
 
     public void indexFiles(List<File> files) {
@@ -72,7 +80,7 @@ public class SolrService {
                         try {
                             return Files.walk(file.toPath());
                         } catch (IOException e) {
-                            log.error("Error while walking directory tree: ", e);
+                            log.error("Error while walking directory tree of {}: ", file, e);
                         }
                         return Stream.of();
                     };
