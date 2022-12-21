@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,6 @@ public class FTSDocsApplication extends Application {
         startSolrServer();
     }
 
-
     private void startSolrServer() {
         long start = System.currentTimeMillis();
         Task<SolrServer> task = new Task<>() {
@@ -68,7 +68,7 @@ public class FTSDocsApplication extends Application {
         };
         task.setOnSucceeded(event -> {
             this.server = task.getValue();
-            var splashStage = this.stage;
+            Stage splashStage = this.stage;
             this.stage = new Stage();
             this.stage.initStyle(StageStyle.DECORATED);
             changeScene("main.fxml");
@@ -80,7 +80,6 @@ public class FTSDocsApplication extends Application {
         thread.start();
     }
 
-
     private void changeScene(String view) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/" + view));
@@ -91,6 +90,8 @@ public class FTSDocsApplication extends Application {
             this.stage.setScene(scene);
             this.stage.centerOnScreen();
             this.stage.show();
+            this.stage.setMinWidth(this.stage.getWidth());
+            this.stage.setMinHeight(this.stage.getHeight());
         } catch (IOException e) {
             log.error("Error while changing view", e);
         }

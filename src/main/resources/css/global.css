@@ -1,0 +1,13 @@
+.document-content {
+  -fx-font-size: 14px;
+}
+
+.highlight {
+  -fx-fill: accent_color;
+  -fx-font-weight: bold;
+}
+
+.content-area {
+  -fx-border-color: black;
+  -fx-border-width: 1;
+}

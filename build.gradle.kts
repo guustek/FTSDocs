@@ -39,6 +39,7 @@ dependencies {
     implementation ("org.apache.tika:tika-core:2.6.0")
     implementation ("org.apache.tika:tika-parsers-standard-package:2.6.0")
     implementation ("org.jfxtras:jmetro:11.6.14")
+    implementation("org.fxmisc.richtext:richtextfx:0.11.0")
 }
 
 javafx {

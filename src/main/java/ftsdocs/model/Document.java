@@ -23,6 +23,8 @@ public class Document {
     private Date creationTime;
     @Field
     private Date lastModifiedTime;
+//    @Field
+//    private double score;
     @Setter
     private String highlight;
 
