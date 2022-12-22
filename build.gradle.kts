@@ -35,11 +35,12 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.10")
     implementation ("commons-io:commons-io:2.11.0")
 
-    implementation("org.springframework:spring-context:6.0.2")
+    implementation("org.springframework:spring-context:6.0.3")
     implementation ("org.apache.tika:tika-core:2.6.0")
     implementation ("org.apache.tika:tika-parsers-standard-package:2.6.0")
     implementation ("org.jfxtras:jmetro:11.6.14")
     implementation("org.fxmisc.richtext:richtextfx:0.11.0")
+    implementation("org.controlsfx:controlsfx:11.1.2")
 }
 
 javafx {

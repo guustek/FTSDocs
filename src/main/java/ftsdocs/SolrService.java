@@ -1,7 +1,6 @@
 package ftsdocs;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javafx.concurrent.Task;
@@ -33,7 +31,7 @@ import ftsdocs.model.FieldName;
 @Slf4j
 @Service
 @Lazy
-public class SolrService {
+public class SolrService implements FullTextSearchService {
 
     private final SolrClient client;
     private final ContentExtractor contentExtractor;
@@ -67,31 +65,18 @@ public class SolrService {
         return documents;
     }
 
-    private static SolrQuery prepareQuery(String query) {
-        return new SolrQuery()
-                .setParam(CommonParams.DF, FieldName.CONTENT)
-                //.setParam(CommonParams.FL, "*", "score")
-                .setParam(HighlightParams.SCORE_K1, "0")
-                .setHighlight(true)
-                .setHighlightFragsize(0)
-                .setHighlightSnippets(Integer.MAX_VALUE - 1)
-                .setHighlightRequireFieldMatch(true)
-                .setRows(100)
-                .setQuery(query);
-    }
-
-    public void indexFilesAsync(List<File> files) {
+    public void indexFiles(Collection<File> files) {
         Task<Void> indexingTask = new Task<>() {
             @Override
             protected Void call() {
-                indexFiles(files);
+                doIndexing(files);
                 return null;
             }
         };
         executor.execute(indexingTask);
     }
 
-    void indexFiles(List<File> files) {
+    private void doIndexing(Collection<File> files) {
         long start = System.currentTimeMillis();
         List<File> indexedFiles = new LinkedList<>();
         for (File file : files) {
@@ -128,5 +113,18 @@ public class SolrService {
                         getName(),
                 indexedFiles.size() == 1 ? "file" : "files",
                 indexedFiles.size(), (double) time / 1000);
+    }
+
+    private static SolrQuery prepareQuery(String query) {
+        return new SolrQuery()
+                .setParam(CommonParams.DF, FieldName.CONTENT)
+                //.setParam(CommonParams.FL, "*", "score")
+                .setParam(HighlightParams.SCORE_K1, "0")
+                .setHighlight(true)
+                .setHighlightFragsize(0)
+                .setHighlightSnippets(Integer.MAX_VALUE - 1)
+                .setHighlightRequireFieldMatch(true)
+                .setRows(100)
+                .setQuery(query);
     }
 }

@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import ftsdocs.DisplayUtils;
-import ftsdocs.SolrService;
+import ftsdocs.FullTextSearchService;
 import ftsdocs.model.Document;
 
 @Slf4j
@@ -72,7 +72,7 @@ public class MainController implements Initializable {
         if (query.isBlank()) {
             query = "*";
         }
-        Collection<Document> result = this.solrService.searchDocuments(query);
+        Collection<Document> result = this.ftsService.searchDocuments(query);
         this.documents.setAll(result);
         documentContentArea.getChildren().clear();
     }
@@ -83,7 +83,7 @@ public class MainController implements Initializable {
         List<File> files = chooser
                 .showOpenMultipleDialog(this.root.getScene().getWindow());
         if (files != null) {
-            this.solrService.indexFilesAsync(files);
+            this.ftsService.indexFiles(files);
         }
     }
 
@@ -92,7 +92,7 @@ public class MainController implements Initializable {
         DirectoryChooser chooser = new DirectoryChooser();
         File directory = chooser.showDialog(this.root.getScene().getWindow());
         if (directory != null) {
-            this.solrService.indexFilesAsync(Collections.singletonList(directory));
+            this.ftsService.indexFiles(Collections.singletonList(directory));
         }
     }
 
@@ -102,8 +102,7 @@ public class MainController implements Initializable {
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
 
-    private final SolrService solrService;
-
+    private final FullTextSearchService ftsService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

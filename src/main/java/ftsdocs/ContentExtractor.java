@@ -2,15 +2,15 @@ package ftsdocs;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
-import ftsdocs.model.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
+
+import ftsdocs.model.Document;
 
 @Service
 @Slf4j
@@ -20,20 +20,6 @@ public class ContentExtractor {
 
     public ContentExtractor() {
         this.tika = new Tika();
-    }
-
-    private String getContent(File file) throws Exception {
-        try {
-            log.info("Detected type for file {} - {}", file, tika.detect(file.getName()));
-            if (file.length() == 0) {
-                log.info("Zero byte file - {}, returning empty content", file);
-                return "";
-            }
-            return tika.parseToString(file);
-        } catch (Exception e) {
-            log.error("Error while extracting content from {}", file, e);
-            throw new Exception(e);
-        }
     }
 
     public Document getDocumentFromFile(File file) {
@@ -57,6 +43,20 @@ public class ContentExtractor {
         } catch (Exception e) {
             log.error("Error while building document: {}", file, e);
             return null;
+        }
+    }
+
+    private String getContent(File file) throws Exception {
+        try {
+            log.info("Detected type {} for file {}", file, tika.detect(file.getName()));
+            if (file.length() == 0) {
+                log.info("Zero byte file - {}, returning empty content", file);
+                return "";
+            }
+            return tika.parseToString(file);
+        } catch (Exception e) {
+            log.error("Error while extracting content from {}", file, e);
+            throw new Exception(e);
         }
     }
 }

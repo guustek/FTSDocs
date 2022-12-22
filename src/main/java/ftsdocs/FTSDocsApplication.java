@@ -43,10 +43,11 @@ public class FTSDocsApplication extends Application {
         log.info("Working directory: {}", SystemUtils.getUserDir());
         log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
 
-        this.jmetro = new JMetro(Style.LIGHT);
         this.context = new AnnotationConfigApplicationContext(getClass());
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", DisplayUtils.toJson(beans));
+
+        this.jmetro = new JMetro(Style.LIGHT);
     }
 
     @Override
