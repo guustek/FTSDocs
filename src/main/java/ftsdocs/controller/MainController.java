@@ -298,7 +298,7 @@ public class MainController implements Initializable {
         while (i < currentHighlights.size()) {
             String highlight = currentHighlights.get(i);
             int foundIndex = documentContentTextArea.getText().indexOf(highlight, lastIndex);
-            if (foundIndex > caretPosition) {
+            if (foundIndex >= caretPosition) {
                 scrollAndSelectContentTo(foundIndex, highlight.length());
                 currentOccurrenceIndex = i;
                 matchesCountLabel.setText(i + 1 + "/" + currentHighlights.size());
