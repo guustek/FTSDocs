@@ -1,4 +1,4 @@
-package ftsdocs;
+package ftsdocs.service;
 
 import java.io.File;
 import java.nio.file.Files;

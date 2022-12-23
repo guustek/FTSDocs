@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -47,7 +46,7 @@ public class FTSDocsApplication extends Application {
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", DisplayUtils.toJson(beans));
 
-        this.jmetro = new JMetro(Style.LIGHT);
+        this.jmetro = new JMetro(ftsdocs.Configuration.style);
     }
 
     @Override

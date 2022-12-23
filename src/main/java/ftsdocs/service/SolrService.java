@@ -1,4 +1,4 @@
-package ftsdocs;
+package ftsdocs.service;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
+import ftsdocs.DisplayUtils;
+import ftsdocs.SolrServer;
 import ftsdocs.model.Document;
 import ftsdocs.model.FieldName;
 
