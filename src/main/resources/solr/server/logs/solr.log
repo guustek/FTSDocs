@@ -1,0 +1,51 @@
+2022-12-24 19:05:44.884 INFO  (main) [] o.e.j.u.log Logging initialized @6266ms to org.eclipse.jetty.util.log.Slf4jLog
+2022-12-24 19:05:45.092 INFO  (main) [] o.e.j.s.Server jetty-9.4.44.v20210927; built: 2021-09-27T23:02:44.612Z; git: 8da83308eeca865e495e53ef315a249d63ba9332; jvm 17.0.3+8-LTS-111
+2022-12-24 19:05:45.806 INFO  (main) [] o.a.s.s.CoreContainerProvider Using logger factory org.apache.logging.slf4j.Log4jLoggerFactory
+2022-12-24 19:05:45.825 INFO  (main) [] o.a.s.s.CoreContainerProvider  ___      _       Welcome to Apache Solr™ version 9.0.0
+2022-12-24 19:05:45.825 INFO  (main) [] o.a.s.s.CoreContainerProvider / __| ___| |_ _   Starting in standalone mode on port 8983
+2022-12-24 19:05:45.826 INFO  (main) [] o.a.s.s.CoreContainerProvider \__ \/ _ \ | '_|  Install dir: D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr
+2022-12-24 19:05:45.826 INFO  (main) [] o.a.s.s.CoreContainerProvider |___/\___/_|_|    Start time: 2022-12-24T19:05:45.826022400Z
+2022-12-24 19:05:45.835 INFO  (main) [] o.a.s.s.CoreContainerProvider Solr Home: D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr (source: system property: solr.solr.home)
+2022-12-24 19:05:45.837 INFO  (main) [] o.a.s.c.SolrXmlConfig Loading solr.xml from D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr\solr.xml
+2022-12-24 19:05:46.978 WARN  (main) [] o.a.s.l.LogWatcher Unable to load LogWatcher org.apache.solr.logging.log4j.Log4jWatcher: org.apache.solr.common.SolrException:  Error loading class 'org.apache.solr.logging.log4j.Log4jWatcher'
+2022-12-24 19:05:46.978 WARN  (main) [] o.a.s.u.StartupLoggingUtils Jetty request logging enabled. Will retain logs for last 3 days. See chapter "Configuring Logging" in reference guide for how to configure.
+2022-12-24 19:05:46.987 WARN  (main) [] o.a.s.c.CoreContainer Not all security plugins configured!  authentication=disabled authorization=disabled.  Solr is only as secure as you make it. Consider configuring authentication/authorization before exposing Solr to users internal or external.  See https://s.apache.org/solrsecurity for more info
+2022-12-24 19:06:05.218 WARN  (main) [] o.a.s.h.a.SystemInfoHandler Resolving canonical hostname for local host took 18.112 seconds, possible DNS misconfiguration. Set the 'solr.dns.prevent.reverse.lookup'  sysprop to true on startup to prevent future lookups if DNS can not be fixed.
+2022-12-24 19:06:05.370 INFO  (main) [] o.a.s.c.CorePropertiesLocator Found 1 core definitions underneath D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr
+2022-12-24 19:06:05.370 INFO  (main) [] o.a.s.c.CorePropertiesLocator Cores are: [core]
+2022-12-24 19:06:05.379 INFO  (coreLoadExecutor-10-thread-1) [] o.a.s.c.TransientSolrCoreCacheDefault Allocating transient core cache for max 2147483647 cores with initial capacity of 1024
+2022-12-24 19:06:05.423 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.c.SolrConfig Using Lucene MatchVersion: 9.0.0
+2022-12-24 19:06:05.484 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.s.IndexSchema Schema name=documents
+2022-12-24 19:06:05.653 WARN  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.D.s.SynonymFilterFactory Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory]. Please consult documentation how to replace it accordingly.
+2022-12-24 19:06:05.659 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.s.IndexSchema Loaded schema documents/1.6 with uniqueid field path
+2022-12-24 19:06:05.748 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.c.CoreContainer Creating SolrCore 'core' using configuration from instancedir D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr\core, trusted=true
+2022-12-24 19:06:05.798 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.c.SolrCore Opening new SolrCore at [D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr\core], dataDir=[D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr\core\data\]
+2022-12-24 19:06:05.978 INFO  (main) [] o.e.j.s.h.ContextHandler Started o.e.j.w.WebAppContext@49f5c307{/solr,file:///D:/STUDIA/Praca%20in%C5%BCynierska/FTSDocs/src/main/resources/solr/server/solr-webapp/webapp/,AVAILABLE}{D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server/solr-webapp/webapp}
+2022-12-24 19:06:05.998 INFO  (main) [] o.e.j.s.RequestLogWriter Opened D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\logs\2022_12_24.request.log
+2022-12-24 19:06:06.017 INFO  (main) [] o.e.j.s.AbstractConnector Started ServerConnector@726e5805{HTTP/1.1, (http/1.1, h2c)}{127.0.0.1:8983}
+2022-12-24 19:06:06.017 INFO  (main) [] o.e.j.s.Server Started @27401ms
+2022-12-24 19:06:07.502 INFO  (qtp1724256292-21) [] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/cores params={indexInfo=false&wt=json&_=1671908767226} status=0 QTime=9
+2022-12-24 19:06:07.541 INFO  (qtp1724256292-22) [] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1671908767226} status=0 QTime=48
+2022-12-24 19:06:07.575 INFO  (qtp1724256292-29) [] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json&_=1671908767226} status=0 QTime=28
+2022-12-24 19:06:07.905 INFO  (qtp1724256292-23) [] o.a.s.s.HttpSolrCall [admin] webapp=null path=/admin/info/system params={wt=json} status=0 QTime=27
+2022-12-24 19:06:24.293 WARN  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.h.a.SystemInfoHandler Resolving canonical hostname for local host took 18.115 seconds, possible DNS misconfiguration. Set the 'solr.dns.prevent.reverse.lookup'  sysprop to true on startup to prevent future lookups if DNS can not be fixed.
+2022-12-24 19:06:24.445 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.u.UpdateHandler Using UpdateLog implementation: org.apache.solr.update.UpdateLog
+2022-12-24 19:06:24.445 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.u.UpdateLog Initializing UpdateLog: dataDir= defaultSyncLevel=FLUSH numRecordsToKeep=100 maxNumLogsToKeep=10 numVersionBuckets=65536
+2022-12-24 19:06:24.455 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.u.CommitTracker Hard AutoCommit: if uncommitted for 15000ms; 
+2022-12-24 19:06:24.455 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.u.CommitTracker Soft AutoCommit: disabled
+2022-12-24 19:06:24.586 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.r.ManagedResourceStorage File-based storage initialized to use dir: D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server\solr\core\conf
+2022-12-24 19:06:24.608 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.s.DirectSolrSpellChecker init: {accuracy=0.5, maxQueryFrequency=0.01, name=default, field=_text_, classname=solr.DirectSolrSpellChecker, distanceMeasure=internal, maxEdits=2, minPrefix=1, maxInspections=5, minQueryLength=4}
+2022-12-24 19:06:24.619 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.h.ReplicationHandler Commits will be reserved for 10000 ms
+2022-12-24 19:06:24.623 INFO  (coreLoadExecutor-10-thread-1) [ x:core] o.a.s.u.UpdateLog Could not find max version in index or recent updates, using new clock 1753123425744846848
+2022-12-24 19:06:24.627 INFO  (searcherExecutor-12-thread-1-processing-core) [ x:core] o.a.s.c.QuerySenderListener QuerySenderListener done.
+2022-12-24 19:06:24.627 INFO  (searcherExecutor-12-thread-1-processing-core) [ x:core] o.a.s.h.c.SpellCheckComponent Loading spell index for spellchecker: default
+2022-12-24 19:06:24.633 INFO  (searcherExecutor-12-thread-1-processing-core) [ x:core] o.a.s.c.SolrCore Registered new searcher autowarm time: 0 ms
+2022-12-24 19:06:26.309 INFO  (ShutdownMonitor) [] o.e.j.s.AbstractConnector Stopped ServerConnector@726e5805{HTTP/1.1, (http/1.1, h2c)}{127.0.0.1:8983}
+2022-12-24 19:06:26.317 INFO  (ShutdownMonitor) [] o.a.s.c.CoreContainer Shutting down CoreContainer instance=1123664282
+2022-12-24 19:06:26.320 INFO  (coreCloseExecutor-18-thread-1) [ x:core] o.a.s.c.SolrCore CLOSING SolrCore org.apache.solr.core.SolrCore@1bb3ae02 core
+2022-12-24 19:06:26.320 INFO  (coreCloseExecutor-18-thread-1) [ x:core] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.core.core tag=SolrCore@1bb3ae02
+2022-12-24 19:06:26.350 INFO  (coreCloseExecutor-18-thread-1) [ x:core] o.a.s.u.DirectUpdateHandler2 Committing on IndexWriter.close()  ... SKIPPED (unnecessary).
+2022-12-24 19:06:26.359 INFO  (ShutdownMonitor) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.node tag=null
+2022-12-24 19:06:26.372 INFO  (ShutdownMonitor) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jvm tag=null
+2022-12-24 19:06:26.385 INFO  (ShutdownMonitor) [] o.a.s.m.SolrMetricManager Closing metric reporters for registry=solr.jetty tag=null
+2022-12-24 19:06:26.400 INFO  (ShutdownMonitor) [] o.e.j.s.h.ContextHandler Stopped o.e.j.w.WebAppContext@49f5c307{/solr,null,STOPPED}{D:\STUDIA\Praca in¿ynierska\FTSDocs\src\main\resources\solr\server/solr-webapp/webapp}

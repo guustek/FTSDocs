@@ -41,6 +41,7 @@ dependencies {
     implementation ("org.jfxtras:jmetro:11.6.14")
     implementation("org.fxmisc.richtext:richtextfx:0.11.0")
     implementation("org.controlsfx:controlsfx:11.1.2")
+    implementation("io.methvin:directory-watcher:0.17.1")
 }
 
 javafx {

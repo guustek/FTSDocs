@@ -1,0 +1,40 @@
+.document-content {
+  -fx-font-size: 14px;
+  -fx-fill: white;
+}
+
+.highlight {
+  -fx-fill: #0078d7;
+  -fx-font-weight: bold;
+}
+
+.matches-box {
+  -fx-border-color: #171717;
+  -fx-border-width: 1px;
+  -fx-padding: 5px;
+}
+
+/*region notification*/
+
+.notification-bar > .pane {
+  -fx-max-width: 50;
+  -fx-min-width: 50;
+  -fx-pref-width: 50;
+  -fx-fill-height: true;
+  -fx-background-color: #333;
+  -fx-border-color: #171717;
+  -fx-padding: 10 10 10 10;
+}
+
+.notification-bar > .pane .title {
+  -fx-font-weight: bold;
+  -fx-text-fill: white;
+}
+
+.notification-bar > .pane .label {
+  -fx-alignment: top-left;
+  -fx-text-fill: white;
+  -fx-wrap-text: true;
+}
+
+/*endregion*/

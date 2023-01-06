@@ -1,198 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import org.controlsfx.control.MasterDetailPane?>
-<?import org.fxmisc.flowless.VirtualizedScrollPane?>
-<?import org.fxmisc.richtext.StyleClassedTextArea?>
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0"
-  minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background"
-  xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="ftsdocs.controller.MainController">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import org.controlsfx.control.*?>
+<?import org.fxmisc.flowless.*?>
+<?import org.fxmisc.richtext.*?>
+
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
   <left>
     <VBox spacing="20.0" styleClass="background" BorderPane.alignment="CENTER">
       <HBox alignment="CENTER">
         <VBox.margin>
-          <Insets/>
+          <Insets />
         </VBox.margin>
         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
           <HBox.margin>
-            <Insets left="5.0" right="5.0"/>
+            <Insets left="5.0" right="5.0" />
           </HBox.margin>
           <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
           </VBox.margin>
         </ImageView>
-        <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-font-weight: bold;"
-          text="FTSDocs" textAlignment="CENTER">
+        <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-font-weight: bold;" text="FTSDocs" textAlignment="CENTER">
           <font>
-            <Font size="16.0"/>
+            <Font size="16.0" />
           </font>
           <HBox.margin>
-            <Insets left="5.0" right="5.0"/>
+            <Insets left="5.0" right="5.0" />
           </HBox.margin>
           <VBox.margin>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
           </VBox.margin>
         </Label>
       </HBox>
-      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308"
-        mnemonicParsing="false" text="Home">
+      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Home">
         <VBox.margin>
-          <Insets left="1.0"/>
+          <Insets left="1.0" />
         </VBox.margin>
         <font>
-          <Font size="14.0"/>
+          <Font size="14.0" />
         </font>
         <graphic>
           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../icon/home_icon.png"/>
+            <Image url="@../icon/home_icon.png" />
           </ImageView>
         </graphic>
       </Button>
-      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-        text="Indexed files">
+      <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Indexed files">
         <VBox.margin>
-          <Insets/>
+          <Insets />
         </VBox.margin>
         <font>
-          <Font size="14.0"/>
+          <Font size="14.0" />
         </font>
         <graphic>
           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../icon/files_icon.png"/>
+            <Image url="@../icon/files_icon.png" />
           </ImageView>
         </graphic>
       </Button>
-      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308"
-        mnemonicParsing="false" text="Settings">
+      <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Settings">
         <font>
-          <Font size="14.0"/>
+          <Font size="14.0" />
         </font>
         <graphic>
           <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-            <Image url="@../icon/settings_icon.png"/>
+            <Image url="@../icon/settings_icon.png" />
           </ImageView>
         </graphic>
       </Button>
-      <Region VBox.vgrow="ALWAYS"/>
-      <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308"
-        mnemonicParsing="false" onMouseClicked="#indexFilesButtonClicked" text="Index files">
+      <Region VBox.vgrow="ALWAYS" />
+      <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#indexFilesButtonClicked" text="Index files">
         <font>
-          <Font size="14.0"/>
+          <Font size="14.0" />
         </font>
       </Button>
-      <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308"
-        mnemonicParsing="false" onMouseClicked="#indexDirectoriesButtonClicked"
-        text="Index directories">
+      <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#indexDirectoriesButtonClicked" text="Index directory">
         <font>
-          <Font size="14.0"/>
+          <Font size="14.0" />
         </font>
       </Button>
       <BorderPane.margin>
-        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </BorderPane.margin>
     </VBox>
   </left>
   <center>
-    <VBox prefHeight="200.0" prefWidth="100.0" styleClass="background"
-      BorderPane.alignment="CENTER">
+    <VBox prefHeight="200.0" prefWidth="100.0" styleClass="background" BorderPane.alignment="CENTER">
       <Label style="-fx-font-weight: bold;" text="Home">
         <font>
-          <Font size="20.0"/>
+          <Font size="20.0" />
         </font>
         <VBox.margin>
-          <Insets bottom="22.0" top="9.0"/>
+          <Insets bottom="22.0" top="9.0" />
         </VBox.margin>
       </Label>
       <HBox alignment="CENTER" spacing="5.0">
         <VBox.margin>
-          <Insets bottom="10.0" top="10.0"/>
+          <Insets bottom="10.0" top="10.0" />
         </VBox.margin>
-        <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false"
-          mnemonicParsing="false" onMouseClicked="#searchButtonClicked">
+        <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#searchButtonClicked">
           <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-              <Image url="@../icon/search_icon.png"/>
+              <Image url="@../icon/search_icon.png" />
             </ImageView>
           </graphic>
           <HBox.margin>
-            <Insets/>
+            <Insets />
           </HBox.margin>
         </Button>
-        <TextField fx:id="searchTextField" HBox.hgrow="ALWAYS">
+        <TextField fx:id="searchTextField" HBox.hgrow="ALWAYS" onKeyPressed="#searchKeyClick">
           <HBox.margin>
-            <Insets/>
+            <Insets />
           </HBox.margin>
         </TextField>
       </HBox>
-      <MasterDetailPane fx:id="documentContentPane" detailSide="BOTTOM" dividerPosition="0.4"
-        showDetailNode="false" VBox.vgrow="ALWAYS">
+      <MasterDetailPane fx:id="documentPreviewPane" detailSide="BOTTOM" dividerPosition="0.4" showDetailNode="false" VBox.vgrow="ALWAYS">
         <VBox.margin>
-          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>
         <masterNode>
           <TableView fx:id="documentTable" VBox.vgrow="ALWAYS">
             <columns>
-              <TableColumn fx:id="documentPathColumn" editable="false"
-                maxWidth="1.7976931348623157E308" minWidth="250.0" prefWidth="250.0"
-                resizable="false" text="Path"/>
-              <TableColumn fx:id="documentSizeColumn" editable="false" maxWidth="80.0"
-                minWidth="80.0" resizable="false" text="Size"/>
-              <TableColumn fx:id="documentCreationTimeColumn" editable="false" maxWidth="150.0"
-                minWidth="150.0" prefWidth="150.0" resizable="false" text="Created"/>
-              <TableColumn fx:id="documentModificationTimeColumn" editable="false" maxWidth="150.0"
-                minWidth="150.0" prefWidth="150.0" resizable="false" text="Modified"/>
+              <TableColumn fx:id="documentPathColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="197.0" prefWidth="197.0" resizable="false" text="Path" />
+              <TableColumn fx:id="documentSizeColumn" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Size" />
+              <TableColumn fx:id="documentCreationTimeColumn" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="Created" />
+              <TableColumn fx:id="documentModificationTimeColumn" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="Modified" />
             </columns>
           </TableView>
         </masterNode>
         <detailNode>
           <VBox>
-            <HBox spacing="10.0">
+            <HBox spacing="10.0" styleClass="matches-box">
               <VBox.margin>
-                <Insets top="10.0" bottom="10.0"/>
+                <Insets bottom="10.0" top="10.0" />
               </VBox.margin>
-              <Label fx:id="matchesCountLabel" maxHeight="Infinity" maxWidth="100" minWidth="100"
-                prefWidth="100" alignment="CENTER"
-                textAlignment="CENTER"
-                contentDisplay="CENTER"/>
-              <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER"
-                focusTraversable="false"
-                mnemonicParsing="false"
-                onMouseClicked="#previousOccurrenceClick">
+              <Label fx:id="matchesCountLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="Infinity" maxWidth="100" minWidth="100" prefWidth="100" textAlignment="CENTER" />
+              <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#previousHighlightClick">
                 <tooltip>
-                  <Tooltip text="Previous occurrence"/>
+                  <Tooltip text="Previous occurrence" />
                 </tooltip>
               </Button>
-              <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER"
-                focusTraversable="false"
-                mnemonicParsing="false"
-                onMouseClicked="#nextOccurrenceClick">
+              <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#nextHighlightClick">
                 <tooltip>
-                  <Tooltip text="Next occurrence"/>
+                  <Tooltip text="Next occurrence" />
+                </tooltip>
+              </Button>
+              <Button fx:id="closePreview" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#closePreviewClick">
+                <tooltip>
+                  <Tooltip text="Close preview" />
                 </tooltip>
               </Button>
             </HBox>
-            <VirtualizedScrollPane hbarPolicy="NEVER" styleClass="background"
-              VBox.vgrow="ALWAYS">
+            <VirtualizedScrollPane hbarPolicy="NEVER" styleClass="background" VBox.vgrow="ALWAYS">
               <content>
-                <StyleClassedTextArea styleClass="background" VBox.vgrow="ALWAYS"
-                  fx:id="documentContentTextArea" wrapText="true" editable="false" showCaret="on">
+                <StyleClassedTextArea fx:id="documentContentTextArea" editable="false" showCaret="off" styleClass="background" wrapText="true" VBox.vgrow="ALWAYS">
                   <padding>
-                    <Insets left="20.0" top="20.0" right="20.0" bottom="20.0"/>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                   </padding>
                 </StyleClassedTextArea>
               </content>
@@ -201,15 +168,11 @@
         </detailNode>
       </MasterDetailPane>
       <BorderPane.margin>
-        <Insets bottom="10.0" top="10.0"/>
+        <Insets bottom="10.0" top="10.0" />
       </BorderPane.margin>
       <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" />
       </padding>
     </VBox>
   </center>
-
-  <stylesheets>
-    <URL value="@../css/global.css"/>
-  </stylesheets>
 </BorderPane>

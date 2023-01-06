@@ -1,0 +1,9 @@
+127.0.0.1 - - [19/wrz/2022:18:07:06 +0000] "GET /solr/admin/info/system?wt=json HTTP/1.1" 200 3641
+127.0.0.1 - - [19/wrz/2022:18:07:57 +0000] "GET /solr/admin/info/system?wt=json HTTP/1.1" 200 3672
+127.0.0.1 - - [19/wrz/2022:18:07:57 +0000] "GET /solr/admin/info/system?wt=json HTTP/1.1" 200 3672
+127.0.0.1 - - [19/wrz/2022:18:07:57 +0000] "GET /solr/admin/cores?action=STATUS&core=test&wt=json HTTP/1.1" 200 106
+127.0.0.1 - - [19/wrz/2022:18:07:58 +0000] "GET /solr/admin/cores?action=CREATE&name=test&instanceDir=test&wt=json HTTP/1.1" 200 76
+127.0.0.1 - - [19/wrz/2022:18:08:45 +0000] "GET /solr/admin/info/system?wt=json HTTP/1.1" 200 3673
+127.0.0.1 - - [19/wrz/2022:18:08:45 +0000] "GET /solr/admin/info/system?wt=json HTTP/1.1" 200 3673
+127.0.0.1 - - [19/wrz/2022:18:08:45 +0000] "GET /solr/admin/cores?action=STATUS&core=core&wt=json HTTP/1.1" 200 105
+127.0.0.1 - - [19/wrz/2022:18:08:46 +0000] "GET /solr/admin/cores?action=CREATE&name=core&instanceDir=core&wt=json HTTP/1.1" 200 76
