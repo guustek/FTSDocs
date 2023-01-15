@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
-import ftsdocs.Configuration;
 import ftsdocs.server.FullTextSearchServer;
 
 @Slf4j

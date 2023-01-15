@@ -1,25 +1,29 @@
-package ftsdocs.controller;
+package ftsdocs.view.controller;
 
 import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.CssParser;
+import javafx.css.Declaration;
+import javafx.css.Rule;
+import javafx.css.Stylesheet;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -38,14 +42,12 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.control.MasterDetailPane;
-import org.fxmisc.richtext.StyleClassedTextArea;
+import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -59,6 +61,11 @@ import ftsdocs.service.FullTextSearchService;
 @Component
 @Lazy
 public class MainController implements Initializable {
+
+    private static final Set<String> DOCUMENT_STYLE_CLASSES = Set.of(
+            "*.highlight",
+            "*.document-content"
+    );
 
     //region Autowired
 
@@ -101,7 +108,7 @@ public class MainController implements Initializable {
     @FXML
     private Button closePreview;
     @FXML
-    private StyleClassedTextArea documentContentTextArea;
+    private InlineCssTextArea documentContentTextArea;
 
     //endregion
 
@@ -117,26 +124,6 @@ public class MainController implements Initializable {
         if (keyEvent.getCode() == KeyCode.ENTER) {
             search();
         }
-    }
-
-    @FXML
-    private void indexFilesButtonClicked(MouseEvent mouseEvent) {
-        FileChooser chooser = new FileChooser();
-        List<File> files = chooser
-                .showOpenMultipleDialog(this.root.getScene().getWindow());
-        if (files != null) {
-            index(files);
-        }
-    }
-
-    @FXML
-    private void indexDirectoriesButtonClicked(MouseEvent mouseEvent) {
-        DirectoryChooser chooser = new DirectoryChooser();
-        File directory = chooser.showDialog(this.root.getScene().getWindow());
-        if (directory != null) {
-            index(Collections.singletonList(directory));
-        }
-
     }
 
     @FXML
@@ -194,7 +181,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Color color = configuration.isDarkModeEnabled() ? Color.BLACK : Color.WHITE;
+        Color color = configuration.isEnableDarkMode() ? Color.BLACK : Color.WHITE;
         documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(0.5))));
@@ -213,33 +200,10 @@ public class MainController implements Initializable {
         Collection<Document> result = this.ftsService.searchDocuments(query);
         this.documents.setAll(result);
         clearContentArea();
+
         this.documentPreviewPane.setShowDetailNode(false);
         DisplayUtils.showNotification(this.root, "Information",
                 "Found " + result.size() + (result.size() == 1 ? " document" : " documents"));
-    }
-
-    private void index(List<File> files) {
-        this.ftsService.indexFiles(files, event -> {
-            Collection<Document> value = ((Collection<Document>) event.getSource().getValue());
-            int selectedCount = files.size();
-            if (files.size() == 1) {
-                File dir = files.get(0);
-                if (dir.isDirectory()) {
-                    try (Stream<Path> pathStream = Files.walk(dir.toPath())) {
-                        selectedCount = (int) pathStream
-                                .map(Path::toFile)
-                                .filter(File::isFile)
-                                .count();
-                    } catch (Exception e) {
-                        log.error("Error while reading directory tree", e);
-                    }
-                }
-            }
-            DisplayUtils.showNotification(this.root, "Information",
-                    "Successfully indexed " + value.size() + " out of " + selectedCount
-                            + " files selected. Check Indexed files for details");
-
-        }, true);
     }
 
     private void handleDocumentClick(MouseEvent event) {
@@ -301,35 +265,96 @@ public class MainController implements Initializable {
         clearContentArea();
         String content = selectedDocument.getHighlight();
 
+        Map<String, Collection<String>> styleStrings = extractDocumentStyles();
+
         if (content == null) {
-            documentContentTextArea.append(selectedDocument.getContent(),
-                    "document-content");
-            previousButton.setDisable(true);
-            nextButton.setDisable(true);
-            matchesCountLabel.setText("0 matches");
+            this.previousButton.setDisable(true);
+            this.nextButton.setDisable(true);
+            this.matchesCountLabel.setText("0 matches");
+
+            Collection<String> finalStyles = new ArrayList<>(
+                    styleStrings.get("*.document-content"));
+            finalStyles.add(
+                    "-fx-font-size: " + this.configuration.getContentFontSize() + "px !important");
+            this.documentContentTextArea.append(selectedDocument.getContent(),
+                    String.join(";", finalStyles));
         } else {
             List<String> contentParts = splitContentByHighlights(content);
-            currentHighlights = new ArrayList<>();
+            this.currentHighlights = new ArrayList<>();
             contentParts.forEach(txt -> {
-                Collection<String> styleClasses = new ArrayList<>();
-                styleClasses.add("document-content");
+                Collection<String> finalStyles = new ArrayList<>(
+                        styleStrings.get("*.document-content"));
+                finalStyles.add("-fx-font-size: " + this.configuration.getContentFontSize()
+                        + "px !important");
                 Matcher matcher = HIGHLIGHT_PATTERN.matcher(txt);
                 if (matcher.matches()) {
-                    styleClasses.add("highlight");
                     txt = matcher.group(2);
-                    currentHighlights.add(txt);
+                    finalStyles.add(
+                            "-fx-fill: " + colorToCssRgb(this.configuration.getHighlightColor())
+                                    + " !important");
+                    finalStyles.addAll(styleStrings.get("*.highlight"));
+                    this.currentHighlights.add(txt);
                 }
-                documentContentTextArea.append(txt, styleClasses);
+                this.documentContentTextArea.append(txt, String.join(";", finalStyles));
             });
-
-            matchesCountLabel.setText(
+            this.matchesCountLabel.setText(
                     currentHighlights.size() + (currentHighlights.size() == 1 ? " match"
                             : " matches"));
-            previousButton.setDisable(false);
-            nextButton.setDisable(false);
+            this.previousButton.setDisable(false);
+            this.nextButton.setDisable(false);
         }
-        documentPreviewPane.setShowDetailNode(true);
+        this.documentPreviewPane.setShowDetailNode(true);
         scrollAndSelectContentTo(0, 0);
+    }
+
+    private Map<String, Collection<String>> extractDocumentStyles() {
+        Map<String, Collection<String>> documentStyles = new HashMap<>();
+
+        ObservableList<String> stylesheetUrls = root.getScene().getStylesheets();
+        for (int i = stylesheetUrls.size() - 1; i >= 0; i--) {
+            try {
+                URL url = new URL(stylesheetUrls.get(i));
+                CssParser cssParser = new CssParser();
+                Stylesheet stylesheet = cssParser.parse(url);
+                List<Rule> rules = stylesheet.getRules();
+                rules.stream()
+                        .filter(rule -> DOCUMENT_STYLE_CLASSES.contains(
+                                rule.getSelectors().get(0).toString()))
+                        .forEach(rule -> {
+                            String styleClass = rule.getSelectors().get(0).toString();
+                            Collection<String> styles = documentStyles.computeIfAbsent(styleClass,
+                                    k -> new ArrayList<>());
+                            styles.add(buildCssDeclaration(rule.getDeclarations().get(0)));
+                        });
+            } catch (Exception e) {
+                log.error("Exception in extractDocumentStyleRules", e);
+            }
+        }
+        return documentStyles;
+    }
+
+    private String buildCssDeclaration(Declaration declaration) {
+        String property = declaration.getProperty();
+
+        Object value = declaration.getParsedValue().getValue();
+
+        String result;
+
+        if (value instanceof Color color) {
+            result = colorToCssRgb(color);
+        } else {
+            result = value.toString();
+        }
+
+        return property + " : " + result;
+
+    }
+
+    private static String colorToCssRgb(Color color) {
+        return "rgb(" +
+                (int) (color.getRed() * 255) + "," +
+                (int) (color.getGreen() * 255) + "," +
+                (int) (color.getBlue() * 255) + ") ";
     }
 
     private void defineDocumentTableColumns() {

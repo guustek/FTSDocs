@@ -1,15 +1,13 @@
 .document-content {
-  -fx-font-size: 14px;
-  -fx-fill: white;
+  -fx-fill: rgb(255, 255, 255);
 }
 
 .highlight {
-  -fx-fill: #0078d7;
   -fx-font-weight: bold;
 }
 
 .matches-box {
-  -fx-border-color: #171717;
+  -fx-border-color: rgb(23, 23, 23);
   -fx-border-width: 1px;
   -fx-padding: 5px;
 }

@@ -1,8 +1,6 @@
 package ftsdocs.solr;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 

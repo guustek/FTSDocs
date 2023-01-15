@@ -27,7 +27,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CommonParams;
-import org.apache.solr.common.params.HighlightParams;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
@@ -174,16 +173,16 @@ public class SolrService implements FullTextSearchService {
         return documents;
     }
 
-    private static SolrQuery prepareQuery(String query) {
+    private SolrQuery prepareQuery(String query) {
         return new SolrQuery()
                 .setParam(CommonParams.DF, FieldName.CONTENT)
                 //.setParam(CommonParams.FL, "*", "score")
-                .setParam(HighlightParams.SCORE_K1, "0")
+                //.setParam(HighlightParams.SCORE_K1, "0")
                 .setHighlight(true)
                 .setHighlightFragsize(0)
-                .setHighlightSnippets(Integer.MAX_VALUE - 1)
+                .setHighlightSnippets(this.configuration.getMaxPhraseHighlights())
                 .setHighlightRequireFieldMatch(true)
-                .setRows(Integer.MAX_VALUE - 1)
+                .setRows(this.configuration.getMaxSearchResults())
                 .setQuery(query);
     }
 

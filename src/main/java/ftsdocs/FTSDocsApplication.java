@@ -10,9 +10,6 @@ import java.time.Instant;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -26,6 +23,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import jfxtras.styles.jmetro.JMetro;
 import jfxtras.styles.jmetro.Style;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,31 +31,31 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.ComponentScan;
 
 import ftsdocs.server.FullTextSearchServer;
+import ftsdocs.view.ViewManager;
+import ftsdocs.view.ViewManagerImpl;
+import ftsdocs.view.Views;
 
 @Slf4j
 @ComponentScan
 public class FTSDocsApplication extends Application {
-
-    private ConfigurableApplicationContext context;
-    private FullTextSearchServer server;
-    private Stage stage;
-    private JMetro jmetro;
 
     public static final String APP_NAME = "FTSDocs";
     //public static final File HOME_DIR = new File(SystemUtils.getUserHome(), APP_NAME);
     public static final File HOME_DIR = new File(APP_NAME);
     public static final File CONFIG_FILE = new File(FTSDocsApplication.HOME_DIR, "config.json");
 
-    public static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .registerTypeAdapter(Instant.class,
-                    (JsonSerializer<Instant>) (Instant date, Type typeOfSrc, JsonSerializationContext jsonContext) ->
-                            new JsonPrimitive(date.toString()))
-            .registerTypeAdapter(Instant.class,
-                    (JsonDeserializer<Instant>) (JsonElement json, Type typeOfSrc, JsonDeserializationContext jsonContext) ->
-                            Instant.parse(json.getAsString()))
-            .create();
+    public static final Gson GSON = buildGson();
+
+    @Getter
+    private ConfigurableApplicationContext context;
+    @Getter
+    private Stage stage;
+    @Getter
+    private JMetro jmetro;
+
+    private ViewManager viewManager;
+
+    private FullTextSearchServer server;
 
     public static void main(String[] args) {
         launch(args);
@@ -73,10 +71,12 @@ public class FTSDocsApplication extends Application {
         this.context = new AnnotationConfigApplicationContext(getClass());
         this.context.getBeanFactory().registerSingleton("configuration", loadConfiguration());
         Configuration configuration = this.context.getBean(Configuration.class);
+        this.viewManager = new ViewManagerImpl(this, configuration);
+        this.context.getBeanFactory().registerSingleton("viewManager", viewManager);
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", GSON.toJson(beans));
 
-        Style style = configuration.isDarkModeEnabled() ? Style.DARK : Style.LIGHT;
+        Style style = configuration.isEnableDarkMode() ? Style.DARK : Style.LIGHT;
         this.jmetro = new JMetro(style);
     }
 
@@ -86,8 +86,20 @@ public class FTSDocsApplication extends Application {
         this.stage = primaryStage;
         this.stage.setTitle(APP_NAME);
         this.stage.initStyle(StageStyle.UNDECORATED);
-        changeScene("splash.fxml");
+        viewManager.changeScene(Views.SPLASH);
+        stage.centerOnScreen();
         startFullTextSearchServer();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (server != null) {
+            server.stop();
+        }
+        stage.hide();
+        context.close();
+        Platform.exit();
+        System.exit(0);
     }
 
     private void startFullTextSearchServer() {
@@ -103,8 +115,11 @@ public class FTSDocsApplication extends Application {
             Stage splashStage = this.stage;
             this.stage = new Stage();
             this.stage.initStyle(StageStyle.DECORATED);
-            changeScene("main.fxml");
+            viewManager.changeScene(Views.MAIN);
             splashStage.close();
+            stage.centerOnScreen();
+            stage.setMinWidth(stage.getWidth());
+            stage.setMinHeight(stage.getHeight());
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", (double) time / 1000);
         });
@@ -112,31 +127,8 @@ public class FTSDocsApplication extends Application {
         thread.start();
     }
 
-    private void changeScene(String view) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/" + view));
-            loader.setControllerFactory(this.context::getBean);
-            Parent root = loader.load();
-            Scene scene = new Scene(root);
-
-            this.jmetro.setScene(scene);
-            String globalCssName =
-                    this.jmetro.getStyle() == Style.DARK ? "global-dark.css" : "global.css";
-            scene.getStylesheets()
-                    .add(this.getClass().getResource("/css/" + globalCssName).toExternalForm());
-
-            this.stage.setScene(scene);
-            this.stage.centerOnScreen();
-            this.stage.show();
-            this.stage.setMinWidth(this.stage.getWidth());
-            this.stage.setMinHeight(this.stage.getHeight());
-        } catch (IOException e) {
-            log.error("Error while changing view", e);
-        }
-    }
-
     private ftsdocs.Configuration loadConfiguration() {
-        if (HOME_DIR.exists()) {
+        if (HOME_DIR.exists() && CONFIG_FILE.exists()) {
             try {
                 String configJson = Files.readString(
                         CONFIG_FILE.toPath(),
@@ -156,14 +148,16 @@ public class FTSDocsApplication extends Application {
         return defaultConfig;
     }
 
-    @Override
-    public void stop() throws Exception {
-        if (server != null) {
-            server.stop();
-        }
-        stage.hide();
-        context.close();
-        Platform.exit();
-        System.exit(0);
+    private static Gson buildGson() {
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .disableHtmlEscaping()
+                .registerTypeAdapter(Instant.class,
+                        (JsonSerializer<Instant>) (Instant source, Type typeOfSrc, JsonSerializationContext jsonContext) ->
+                                new JsonPrimitive(source.toString()))
+                .registerTypeAdapter(Instant.class,
+                        (JsonDeserializer<Instant>) (JsonElement json, Type typeOfSrc, JsonDeserializationContext jsonContext) ->
+                                Instant.parse(json.getAsString()))
+                .create();
     }
 }
