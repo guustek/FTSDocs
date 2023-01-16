@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox fx:id="root" spacing="20.0" styleClass="background" BorderPane.alignment="CENTER"
+  fx:controller="ftsdocs.view.controller.MenuController"
+  xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+  <HBox alignment="CENTER">
+    <VBox.margin>
+      <Insets/>
+    </VBox.margin>
+    <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+      <HBox.margin>
+        <Insets left="5.0" right="5.0"/>
+      </HBox.margin>
+      <VBox.margin>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </VBox.margin>
+    </ImageView>
+    <Label alignment="CENTER" contentDisplay="CENTER" style="-fx-font-weight: bold;" text="FTSDocs"
+      textAlignment="CENTER">
+      <font>
+        <Font size="16.0"/>
+      </font>
+      <HBox.margin>
+        <Insets left="5.0" right="5.0"/>
+      </HBox.margin>
+      <VBox.margin>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+      </VBox.margin>
+    </Label>
+  </HBox>
+  <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308"
+    mnemonicParsing="false" text="Home" onAction="#homeClick">
+    <VBox.margin>
+      <Insets left="1.0"/>
+    </VBox.margin>
+    <font>
+      <Font size="14.0"/>
+    </font>
+    <graphic>
+      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+        <Image url="@../icon/home_icon.png"/>
+      </ImageView>
+    </graphic>
+  </Button>
+  <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+    text="Indexed files" onAction="#indexedFilesClick">
+    <VBox.margin>
+      <Insets/>
+    </VBox.margin>
+    <font>
+      <Font size="14.0"/>
+    </font>
+    <graphic>
+      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+        <Image url="@../icon/files_icon.png"/>
+      </ImageView>
+    </graphic>
+  </Button>
+  <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308"
+    mnemonicParsing="false" text="Settings" onAction="#settingsClick">
+    <font>
+      <Font size="14.0"/>
+    </font>
+    <graphic>
+      <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+        <Image url="@../icon/settings_icon.png"/>
+      </ImageView>
+    </graphic>
+  </Button>
+  <Region VBox.vgrow="ALWAYS"/>
+  <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308"
+    mnemonicParsing="false" onMouseClicked="#indexFilesButtonClicked" text="Index files">
+    <font>
+      <Font size="14.0"/>
+    </font>
+  </Button>
+  <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308"
+    mnemonicParsing="false" onMouseClicked="#indexDirectoriesButtonClicked" text="Index directory">
+    <font>
+      <Font size="14.0"/>
+    </font>
+  </Button>
+  <BorderPane.margin>
+    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+  </BorderPane.margin>
+</VBox>
