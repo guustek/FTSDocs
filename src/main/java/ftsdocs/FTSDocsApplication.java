@@ -31,13 +31,16 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.ComponentScan;
 
 import ftsdocs.server.FullTextSearchServer;
+import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
 import ftsdocs.view.ViewManagerImpl;
-import ftsdocs.view.Views;
 
 @Slf4j
 @ComponentScan
 public class FTSDocsApplication extends Application {
+
+    public static final double MIN_HEIGHT = 700;
+    public static final double MIN_WIDTH = 900;
 
     public static final String APP_NAME = "FTSDocs";
     //public static final File HOME_DIR = new File(SystemUtils.getUserHome(), APP_NAME);
@@ -68,11 +71,15 @@ public class FTSDocsApplication extends Application {
         log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
         log.info("Working directory: {}", SystemUtils.getUserDir());
         log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
+
         this.context = new AnnotationConfigApplicationContext(getClass());
+
         this.context.getBeanFactory().registerSingleton("configuration", loadConfiguration());
         Configuration configuration = this.context.getBean(Configuration.class);
+
         this.viewManager = new ViewManagerImpl(this, configuration);
         this.context.getBeanFactory().registerSingleton("viewManager", viewManager);
+
         String[] beans = this.context.getBeanDefinitionNames();
         log.info("Registered spring beans {}", GSON.toJson(beans));
 
@@ -86,18 +93,19 @@ public class FTSDocsApplication extends Application {
         this.stage = primaryStage;
         this.stage.setTitle(APP_NAME);
         this.stage.initStyle(StageStyle.UNDECORATED);
-        viewManager.changeScene(Views.SPLASH);
-        stage.centerOnScreen();
+        this.viewManager.changeScene(View.SPLASH);
+        this.stage.sizeToScene();
+        this.stage.centerOnScreen();
         startFullTextSearchServer();
     }
 
     @Override
     public void stop() throws Exception {
-        if (server != null) {
-            server.stop();
+        if (this.server != null) {
+            this.server.stop();
         }
-        stage.hide();
-        context.close();
+        this.stage.hide();
+        this.context.close();
         Platform.exit();
         System.exit(0);
     }
@@ -113,13 +121,15 @@ public class FTSDocsApplication extends Application {
         task.setOnSucceeded(event -> {
             this.server = task.getValue();
             Stage splashStage = this.stage;
+            splashStage.close();
+
             this.stage = new Stage();
             this.stage.initStyle(StageStyle.DECORATED);
-            viewManager.changeScene(Views.MAIN);
-            splashStage.close();
-            stage.centerOnScreen();
-            stage.setMinWidth(stage.getWidth());
-            stage.setMinHeight(stage.getHeight());
+            this.viewManager.changeScene(View.MAIN);
+            this.stage.sizeToScene();
+            this.stage.setMinWidth(this.stage.getWidth());
+            this.stage.setMinHeight(this.stage.getHeight());
+            this.stage.centerOnScreen();
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", (double) time / 1000);
         });

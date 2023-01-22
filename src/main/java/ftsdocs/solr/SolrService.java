@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
 import ftsdocs.Configuration;
+import ftsdocs.DisplayUtils;
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.IndexedFilesVisitor;
 import ftsdocs.model.Document;
@@ -51,21 +53,22 @@ public class SolrService implements FullTextSearchService {
     private final Configuration configuration;
     private final Map<Path, DirectoryWatcher> watchers;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public SolrService(ContentExtractor contentExtractor, FullTextSearchServer server,
             Configuration configuration) {
         this.client = server.getClient();
         this.contentExtractor = contentExtractor;
         this.configuration = configuration;
         this.executor = Executors.newCachedThreadPool(
-                new CustomizableThreadFactory("Index monitor thread-"));
+                new CustomizableThreadFactory("Index handler thread-"));
         this.watchers = new ConcurrentHashMap<>();
 
-        deleteNonExistingFilesFromIndex();
-        List<File> indexedFiles = this.configuration.getIndexedLocations().stream()
+        List<File> indexLocations = this.configuration.getIndexedLocations().stream()
                 .map(File::new)
                 .toList();
-        indexFiles(indexedFiles, null, true);
 
+        updateIndices();
+        updateWatchers(indexLocations);
     }
 
     public Collection<Document> searchDocuments(String query) {
@@ -98,37 +101,76 @@ public class SolrService implements FullTextSearchService {
         }
     }
 
-    public void indexFiles(Collection<File> files, EventHandler<WorkerStateEvent> successHandler,
+    public void indexFiles(Collection<File> indexLocations,
+            EventHandler<WorkerStateEvent> successHandler,
             boolean updateWatcher) {
-        if (updateWatcher) {
-            files.parallelStream().forEach(file -> {
-                updateWatcher(file.toPath());
-                this.configuration.getIndexedLocations().add(file.getPath());
-                this.configuration.writeToFile();
-            });
-        }
-
-        Collection<File> actualFiles = files.stream()
-                .flatMap(file -> readFileTree(file).stream())
-                .toList();
 
         Task<Collection<Document>> indexingTask = new Task<>() {
             @Override
             protected Collection<Document> call() {
-                return doIndexing(actualFiles);
+                long start = System.currentTimeMillis();
+                log.info("Started indexing locations: {}",
+                        DisplayUtils.toUnescapedWhiteSpacesJson(
+                                indexLocations.stream().map(File::getName)));
+
+                Collection<File> actualFiles = indexLocations.stream()
+                        .flatMap(file -> readFileTree(file).stream())
+                        .toList();
+
+                Collection<Document> documents = doIndexing(actualFiles);
+
+                long time = System.currentTimeMillis() - start;
+                log.info("{} finished indexing {} {} in {} seconds",
+                        Thread.currentThread().getName(),
+                        documents.size(),
+                        documents.size() == 1 ? "file" : "files",
+                        (double) time / 1000);
+
+                return documents;
             }
         };
         indexingTask.setOnSucceeded(successHandler);
         executor.execute(indexingTask);
+
+        if (updateWatcher) {
+            updateWatchers(indexLocations);
+        }
     }
 
-    private void deleteNonExistingFilesFromIndex() {
+    private void updateIndices() {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Collection<File> actualFiles = configuration.getIndexedLocations().stream()
+                        .flatMap(location -> readFileTree(new File(location)).stream())
+                        .toList();
+                deleteNonExistingFilesFromIndex(actualFiles);
+                doIndexing(actualFiles);
+                return null;
+            }
+        };
+        executor.execute(task);
+    }
+
+    private void updateWatchers(Collection<File> indexLocations) {
+        Task<Void> updateWatchersTask = new Task<>() {
+            @Override
+            protected Void call() {
+                indexLocations.parallelStream().forEach(file -> {
+                    configuration.getIndexedLocations().add(file.getPath());
+                    configuration.writeToFile();
+                    updateWatcher(file.toPath());
+                });
+                return null;
+            }
+        };
+        executor.execute(updateWatchersTask);
+    }
+
+    private void deleteNonExistingFilesFromIndex(Collection<File> actualFiles) {
+        // TODO need to show that these dont exist anymore instead of deleting
         this.configuration.getIndexedLocations().removeIf(path -> !new File(path).exists());
         this.configuration.writeToFile();
-
-        Collection<File> actualFiles = this.configuration.getIndexedLocations().stream()
-                .flatMap(file -> readFileTree(new File(file)).stream())
-                .toList();
 
         searchDocuments("*").stream()
                 .map(doc -> Path.of(doc.getPath()))
@@ -151,25 +193,23 @@ public class SolrService implements FullTextSearchService {
         return Collections.emptyList();
     }
 
-    private Collection<Document> doIndexing(Collection<File> files) {
-        long start = System.currentTimeMillis();
-        List<Document> documents = files.parallelStream()
-                .map(contentExtractor::getDocumentFromFile)
-                .filter(Objects::nonNull)
-                .toList();
+    private Collection<Document> doIndexing(Collection<File> actualFiles) {
+
+        Collection<Document> documents = new ArrayList<>();
+
         try {
+            documents = actualFiles.parallelStream()
+                    .filter(file -> !file.isDirectory())
+                    .map(contentExtractor::getDocumentFromFile)
+                    .filter(Objects::nonNull)
+                    .toList();
+
             client.addBeans(documents);
             client.commit();
         } catch (Exception e) {
-            log.error("Error while indexing files: {}",
-                    FTSDocsApplication.GSON.toJson(documents.stream().map(Document::getPath).toList()), e);
+            log.error("Error while indexing paths: {}",
+                    FTSDocsApplication.GSON.toJson(actualFiles.stream().map(File::getPath)), e);
         }
-        long time = System.currentTimeMillis() - start;
-        log.info("{} finished indexing {} {} in {} seconds",
-                Thread.currentThread().
-                        getName(),
-                documents.size() == 1 ? "file" : "files",
-                documents.size(), (double) time / 1000);
         return documents;
     }
 
@@ -187,7 +227,7 @@ public class SolrService implements FullTextSearchService {
     }
 
     private void handleFileChangeEvent(Path sourcePath, DirectoryChangeEvent event) {
-        if(event.eventType() == EventType.OVERFLOW){
+        if (event.eventType() == EventType.OVERFLOW) {
             log.info("FileSystemEvent - Type: {}, source path: {}, root path: {}, path: {}",
                     event.eventType(), sourcePath, event.rootPath(), event.path());
         }
@@ -210,13 +250,12 @@ public class SolrService implements FullTextSearchService {
             DirectoryChangeEvent event) {
 
         //Single file indexed
-        if(sourcePath.equals(event.path()))
+        if (sourcePath.equals(event.path())) {
             return true;
+        }
 
         //Directory indexed
-        if(event.path().startsWith(sourcePath))
-            return true;
-        return false;
+        return event.path().startsWith(sourcePath);
     }
 
     private void updateWatcher(Path sourcePath) {

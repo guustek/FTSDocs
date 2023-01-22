@@ -2,13 +2,10 @@ package ftsdocs.view.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Stream;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -26,8 +23,8 @@ import org.springframework.stereotype.Component;
 import ftsdocs.DisplayUtils;
 import ftsdocs.model.Document;
 import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
-import ftsdocs.view.Views;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -68,7 +65,7 @@ public class MenuController implements Initializable {
 
     @FXML
     private void homeClick(ActionEvent actionEvent) {
-        viewManager.changeScene(Views.MAIN);
+        viewManager.changeScene(View.MAIN);
     }
 
     @FXML
@@ -78,29 +75,15 @@ public class MenuController implements Initializable {
 
     @FXML
     private void settingsClick(ActionEvent actionEvent) {
-        viewManager.changeScene(Views.SETTINGS);
+        viewManager.changeScene(View.SETTINGS);
     }
 
     private void index(List<File> files) {
         this.ftsService.indexFiles(files, event -> {
             Collection<Document> value = ((Collection<Document>) event.getSource().getValue());
-            int selectedCount = files.size();
-            if (files.size() == 1) {
-                File dir = files.get(0);
-                if (dir.isDirectory()) {
-                    try (Stream<Path> pathStream = Files.walk(dir.toPath())) {
-                        selectedCount = (int) pathStream
-                                .map(Path::toFile)
-                                .filter(File::isFile)
-                                .count();
-                    } catch (Exception e) {
-                        log.error("Error while reading directory tree", e);
-                    }
-                }
-            }
+
             DisplayUtils.showNotification(this.root, "Information",
-                    "Successfully indexed " + value.size() + " out of " + selectedCount
-                            + " files selected. Check Indexed files for details");
+                    "Indexed " + value.size() + " files. Check Indexed files for details");
 
         }, true);
     }

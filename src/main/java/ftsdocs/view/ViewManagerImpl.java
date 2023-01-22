@@ -26,10 +26,10 @@ public class ViewManagerImpl implements ViewManager {
 
     private final Configuration configuration;
 
-    public void changeScene(String viewName) {
+    public void changeScene(View view) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/view/" + viewName + ".fxml"));
+                    getClass().getResource("/view/" + view.name().toLowerCase() + ".fxml"));
             loader.setControllerFactory(this.application.getContext()::getBean);
             Parent root = loader.load();
             Scene scene = new Scene(root);
@@ -45,8 +45,17 @@ public class ViewManagerImpl implements ViewManager {
 
             Stage stage = this.application.getStage();
             stage.setScene(scene);
+
+            double height = stage.getHeight();
+            double width = stage.getWidth();
+
+            stage.setHeight(height);
+            stage.setWidth(width);
+
             stage.show();
-            log.info("Changed view to " + viewName);
+
+            log.info("Changed view to " + view);
+
         } catch (IOException e) {
             log.error("Error while changing view", e);
         }

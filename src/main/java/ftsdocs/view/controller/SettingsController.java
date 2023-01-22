@@ -1,11 +1,14 @@
 package ftsdocs.view.controller;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.Set;
 
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 
 import lombok.RequiredArgsConstructor;
@@ -14,9 +17,12 @@ import org.controlsfx.control.PropertySheet;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import ftsdocs.CheckComboBoxEditor;
 import ftsdocs.Configuration;
 import ftsdocs.Configuration.Categories;
+import ftsdocs.model.DocumentType;
 import ftsdocs.model.PropertyItem;
+import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
 
 @Slf4j
@@ -25,8 +31,8 @@ import ftsdocs.view.ViewManager;
 @Lazy
 public class SettingsController implements Initializable {
 
-    @FXML
-    private BorderPane root;
+    private static boolean shouldReload = true;
+
     @FXML
     private PropertySheet propertySheet;
 
@@ -41,14 +47,23 @@ public class SettingsController implements Initializable {
         initializeProperties();
     }
 
+    @FXML
+    private void resetClick() {
+        configuration.reset();
+        configuration.writeToFile();
+        viewManager.changeScene(View.SETTINGS);
+    }
+
+    @SuppressWarnings("java:S2696")
     private void initializeProperties() {
+
         //region Appearance
 
         this.propertySheet.getItems()
                 .add(new PropertyItem(
                         boolean.class,
                         "Enable dark mode",
-                        Categories.APPEARANCE) {
+                        Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return configuration.isEnableDarkMode();
@@ -65,7 +80,7 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         Color.class,
                         "Phrase highlight color",
-                        Categories.APPEARANCE) {
+                        Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return configuration.getHighlightColor();
@@ -82,7 +97,7 @@ public class SettingsController implements Initializable {
                 new PropertyItem(
                         int.class,
                         "Document content font size",
-                        Categories.APPEARANCE) {
+                        Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return configuration.getContentFontSize();
@@ -103,7 +118,7 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         int.class,
                         "Max search results",
-                        Categories.SEARCHING) {
+                        Categories.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return configuration.getMaxSearchResults();
@@ -120,7 +135,7 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         int.class,
                         "Max phrase highlights",
-                        Categories.SEARCHING) {
+                        Categories.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return configuration.getMaxPhraseHighlights();
@@ -134,5 +149,28 @@ public class SettingsController implements Initializable {
                 });
 
         //endregion Searching
+
+        //region Indexing
+
+        propertySheet.getItems().add(
+                new PropertyItem(Set.class, "Document types", Categories.INDEXING.getDisplayName(),
+                        CheckComboBoxEditor.class) {
+                    @Override
+                    public Object getValue() {
+                        return new SimpleListProperty<>(FXCollections.observableArrayList(
+                                configuration.getDocumentTypes()));
+                    }
+
+                    @SuppressWarnings("unchecked")
+                    @Override
+                    public void setValue(Object value) {
+                        Collection<DocumentType> selectedDocumentTypes = ((Collection<DocumentType>) value);
+                        configuration.getDocumentTypes().forEach(
+                                doc -> doc.setEnabled(selectedDocumentTypes.contains(doc)));
+                        configuration.writeToFile();
+                    }
+                });
+
+        //endregion Indexing
     }
 }

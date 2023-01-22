@@ -29,6 +29,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -62,9 +63,12 @@ import ftsdocs.service.FullTextSearchService;
 @Lazy
 public class MainController implements Initializable {
 
+    private static final String HIGHLIGHT_STYLE_CLASS = "*.highlight";
+    private static final String DOCUMENT_CONTENT_STYLE_CLASS =  "*.document-content";
+
     private static final Set<String> DOCUMENT_STYLE_CLASSES = Set.of(
-            "*.highlight",
-            "*.document-content"
+            HIGHLIGHT_STYLE_CLASS,
+            DOCUMENT_CONTENT_STYLE_CLASS
     );
 
     //region Autowired
@@ -106,8 +110,6 @@ public class MainController implements Initializable {
     @FXML
     private Button previousButton;
     @FXML
-    private Button closePreview;
-    @FXML
     private InlineCssTextArea documentContentTextArea;
 
     //endregion
@@ -115,7 +117,7 @@ public class MainController implements Initializable {
     //region FXML methods
 
     @FXML
-    private void searchButtonClicked(MouseEvent mouseEvent) {
+    private void searchButtonClicked() {
         search();
     }
 
@@ -127,7 +129,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void previousHighlightClick(MouseEvent mouseEvent) {
+    private void previousHighlightClick() {
         int caretPosition = documentContentTextArea.getCaretPosition();
         int lastIndex = documentContentTextArea.getLength();
         int i = currentHighlights.size() - 1;
@@ -150,7 +152,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void nextHighlightClick(MouseEvent mouseEvent) {
+    private void nextHighlightClick() {
         int caretPosition = documentContentTextArea.getCaretPosition();
         int lastIndex = 0;
         int i = 0;
@@ -173,7 +175,7 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void closePreviewClick(MouseEvent mouseEvent) {
+    private void closePreviewClick() {
         documentPreviewPane.setShowDetailNode(false);
     }
 
@@ -185,11 +187,14 @@ public class MainController implements Initializable {
         documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(0.5))));
-        documentContentTextArea.setLineHighlighterFill(Color.RED);
         defineDocumentTableColumns();
         this.documentTable.setItems(documents);
         this.documentTable.setEditable(false);
-        this.documentTable.setOnMouseClicked(this::handleDocumentClick);
+        this.documentTable.setRowFactory(param -> {
+            TableRow<Document> row = new TableRow<>();
+            row.setOnMouseClicked(this::handleDocumentClick);
+            return row;
+        });
     }
 
     private void search() {
@@ -210,7 +215,8 @@ public class MainController implements Initializable {
         if (event.getButton() != MouseButton.PRIMARY) {
             return;
         }
-        Document selectedDocument = this.documentTable.getSelectionModel().getSelectedItem();
+        @SuppressWarnings("unchecked")
+        Document selectedDocument = ((TableRow<Document>) event.getSource()).getItem();
         if (selectedDocument == null) {
             return;
         }
@@ -273,7 +279,7 @@ public class MainController implements Initializable {
             this.matchesCountLabel.setText("0 matches");
 
             Collection<String> finalStyles = new ArrayList<>(
-                    styleStrings.get("*.document-content"));
+                    styleStrings.get(DOCUMENT_CONTENT_STYLE_CLASS));
             finalStyles.add(
                     "-fx-font-size: " + this.configuration.getContentFontSize() + "px !important");
             this.documentContentTextArea.append(selectedDocument.getContent(),
@@ -283,7 +289,7 @@ public class MainController implements Initializable {
             this.currentHighlights = new ArrayList<>();
             contentParts.forEach(txt -> {
                 Collection<String> finalStyles = new ArrayList<>(
-                        styleStrings.get("*.document-content"));
+                        styleStrings.get(DOCUMENT_CONTENT_STYLE_CLASS));
                 finalStyles.add("-fx-font-size: " + this.configuration.getContentFontSize()
                         + "px !important");
                 Matcher matcher = HIGHLIGHT_PATTERN.matcher(txt);
@@ -292,7 +298,7 @@ public class MainController implements Initializable {
                     finalStyles.add(
                             "-fx-fill: " + colorToCssRgb(this.configuration.getHighlightColor())
                                     + " !important");
-                    finalStyles.addAll(styleStrings.get("*.highlight"));
+                    finalStyles.addAll(styleStrings.get(HIGHLIGHT_STYLE_CLASS));
                     this.currentHighlights.add(txt);
                 }
                 this.documentContentTextArea.append(txt, String.join(";", finalStyles));
