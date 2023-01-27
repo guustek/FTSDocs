@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import jfxtras.styles.jmetro.Style;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,6 @@ import ftsdocs.FTSDocsApplication;
 public class ViewManagerImpl implements ViewManager {
 
     private final FTSDocsApplication application;
-
     private final Configuration configuration;
 
     public void changeScene(View view) {
@@ -59,5 +59,14 @@ public class ViewManagerImpl implements ViewManager {
         } catch (IOException e) {
             log.error("Error while changing view", e);
         }
+    }
+
+    @Override
+    public void showNotification(String title, String text) {
+        Notifications.create()
+                .owner(this.application.getStage())
+                .title(title)
+                .text(text)
+                .show();
     }
 }

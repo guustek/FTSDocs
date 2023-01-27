@@ -6,6 +6,10 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -39,6 +43,10 @@ import ftsdocs.view.ViewManagerImpl;
 @ComponentScan
 public class FTSDocsApplication extends Application {
 
+    static {
+        System.setProperty("logFileName", "FTSDocs-.log");
+    }
+
     public static final double MIN_HEIGHT = 700;
     public static final double MIN_WIDTH = 900;
 
@@ -48,6 +56,7 @@ public class FTSDocsApplication extends Application {
     public static final File CONFIG_FILE = new File(FTSDocsApplication.HOME_DIR, "config.json");
 
     public static final Gson GSON = buildGson();
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = getDATE_TIME_FORMATTER();
 
     @Getter
     private ConfigurableApplicationContext context;
@@ -67,7 +76,7 @@ public class FTSDocsApplication extends Application {
     @Override
     public void init() {
         log.info("Starting application at {} on host: {}",
-                DisplayUtils.dateTimeFormatter.format(Instant.now()), SystemUtils.getHostName());
+                DATE_TIME_FORMATTER.format(Instant.now()), SystemUtils.getHostName());
         log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
         log.info("Working directory: {}", SystemUtils.getUserDir());
         log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
@@ -169,5 +178,12 @@ public class FTSDocsApplication extends Application {
                         (JsonDeserializer<Instant>) (JsonElement json, Type typeOfSrc, JsonDeserializationContext jsonContext) ->
                                 Instant.parse(json.getAsString()))
                 .create();
+    }
+
+    private static DateTimeFormatter getDATE_TIME_FORMATTER() {
+        return DateTimeFormatter.ofLocalizedDateTime(
+                        FormatStyle.MEDIUM)
+                .withLocale(Locale.getDefault())
+                .withZone(ZoneId.systemDefault());
     }
 }

@@ -13,7 +13,8 @@ public interface FullTextSearchService {
 
     Collection<Document> searchDocuments(String query);
 
-    void deleteFromIndex(Path path);
+    void deleteFromIndex(Collection<Path> path);
 
-    void indexFiles(Collection<File> files, EventHandler<WorkerStateEvent> successHandler, boolean updateWatcher);
+    void indexFiles(Collection<File> files, boolean updateWatcher,
+            EventHandler<WorkerStateEvent> successHandler);
 }

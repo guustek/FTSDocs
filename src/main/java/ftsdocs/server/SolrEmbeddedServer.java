@@ -1,4 +1,4 @@
-package ftsdocs.solr;
+package ftsdocs.server;
 
 import java.io.IOException;
 import java.nio.file.Path;

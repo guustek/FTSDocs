@@ -53,9 +53,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import ftsdocs.Configuration;
-import ftsdocs.DisplayUtils;
+import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.Document;
+import ftsdocs.model.HighlightSnippet;
 import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.ViewManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +66,7 @@ import ftsdocs.service.FullTextSearchService;
 public class MainController implements Initializable {
 
     private static final String HIGHLIGHT_STYLE_CLASS = "*.highlight";
-    private static final String DOCUMENT_CONTENT_STYLE_CLASS =  "*.document-content";
+    private static final String DOCUMENT_CONTENT_STYLE_CLASS = "*.document-content";
 
     private static final Set<String> DOCUMENT_STYLE_CLASSES = Set.of(
             HIGHLIGHT_STYLE_CLASS,
@@ -77,13 +79,17 @@ public class MainController implements Initializable {
 
     private final Configuration configuration;
 
+    private final ViewManager viewManager;
+
     //endregion
 
     private static final Pattern HIGHLIGHT_PATTERN = Pattern.compile("(<em>(.*?)</em>)");
 
     private final ObservableList<Document> documents = FXCollections.observableArrayList();
 
-    private List<String> currentHighlights;
+    private List<HighlightSnippet> currentHighlights;
+
+    private int currentHighlightIndex;
 
     //region FXML fields
 
@@ -130,48 +136,26 @@ public class MainController implements Initializable {
 
     @FXML
     private void previousHighlightClick() {
-        int caretPosition = documentContentTextArea.getCaretPosition();
-        int lastIndex = documentContentTextArea.getLength();
-        int i = currentHighlights.size() - 1;
-        while (i >= 0) {
-            String highlight = currentHighlights.get(i);
-            int foundIndex = documentContentTextArea.getText().lastIndexOf(highlight, lastIndex);
-            if (foundIndex < caretPosition - highlight.length()) {
-                scrollAndSelectContentTo(foundIndex, highlight.length());
-                matchesCountLabel.setText(i + 1 + "/" + currentHighlights.size());
-                break;
-            }
-            lastIndex = foundIndex - 1;
-            if (i == 0) {
-                caretPosition = documentContentTextArea.getLength() - 1;
-                lastIndex = documentContentTextArea.getLength() - 1;
-                i = currentHighlights.size();
-            }
-            i--;
+        this.currentHighlightIndex--;
+        if (this.currentHighlightIndex < 0) {
+            this.currentHighlightIndex = this.currentHighlights.size() - 1;
         }
+        HighlightSnippet highlight = this.currentHighlights.get(this.currentHighlightIndex);
+        scrollToAndSelect(highlight);
+        this.matchesCountLabel.setText(
+                this.currentHighlightIndex + 1 + "/" + this.currentHighlights.size());
     }
 
     @FXML
     private void nextHighlightClick() {
-        int caretPosition = documentContentTextArea.getCaretPosition();
-        int lastIndex = 0;
-        int i = 0;
-        while (i < currentHighlights.size()) {
-            String highlight = currentHighlights.get(i);
-            int foundIndex = documentContentTextArea.getText().indexOf(highlight, lastIndex);
-            if (foundIndex >= caretPosition) {
-                scrollAndSelectContentTo(foundIndex, highlight.length());
-                matchesCountLabel.setText(i + 1 + "/" + currentHighlights.size());
-                break;
-            }
-            lastIndex = foundIndex + 1;
-            if (i == currentHighlights.size() - 1) {
-                caretPosition = 0;
-                lastIndex = 0;
-                i = -1;
-            }
-            i++;
+        this.currentHighlightIndex++;
+        if (this.currentHighlightIndex > this.currentHighlights.size() - 1) {
+            this.currentHighlightIndex = 0;
         }
+        HighlightSnippet highlight = this.currentHighlights.get(this.currentHighlightIndex);
+        scrollToAndSelect(highlight);
+        this.matchesCountLabel.setText(
+                this.currentHighlightIndex + 1 + "/" + this.currentHighlights.size());
     }
 
     @FXML
@@ -207,7 +191,7 @@ public class MainController implements Initializable {
         clearContentArea();
 
         this.documentPreviewPane.setShowDetailNode(false);
-        DisplayUtils.showNotification(this.root, "Information",
+        this.viewManager.showNotification("Information",
                 "Found " + result.size() + (result.size() == 1 ? " document" : " documents"));
     }
 
@@ -250,15 +234,19 @@ public class MainController implements Initializable {
                 desktop.open(file);
             } catch (Exception e) {
                 log.error("Failed opening file: {}", path, e);
-                DisplayUtils.showNotification(this.root, "Error", e.getMessage());
+                this.viewManager.showNotification("Error", e.getMessage());
             }
         }
     }
 
-    private void scrollAndSelectContentTo(int start, int length) {
+    private void scrollToAndSelect(int start, int length) {
         documentContentTextArea.moveTo(start);
         documentContentTextArea.selectRange(start, start + length);
         documentContentTextArea.requestFollowCaret();
+    }
+
+    private void scrollToAndSelect(HighlightSnippet highlightSnippet) {
+        scrollToAndSelect(highlightSnippet.index(), highlightSnippet.text().length());
     }
 
     private void clearContentArea() {
@@ -287,6 +275,7 @@ public class MainController implements Initializable {
         } else {
             List<String> contentParts = splitContentByHighlights(content);
             this.currentHighlights = new ArrayList<>();
+            this.currentHighlightIndex = -1;
             contentParts.forEach(txt -> {
                 Collection<String> finalStyles = new ArrayList<>(
                         styleStrings.get(DOCUMENT_CONTENT_STYLE_CLASS));
@@ -299,7 +288,10 @@ public class MainController implements Initializable {
                             "-fx-fill: " + colorToCssRgb(this.configuration.getHighlightColor())
                                     + " !important");
                     finalStyles.addAll(styleStrings.get(HIGHLIGHT_STYLE_CLASS));
-                    this.currentHighlights.add(txt);
+                    this.currentHighlights.add(
+                            new HighlightSnippet(txt,
+                                    documentContentTextArea.getContent().getLength())
+                    );
                 }
                 this.documentContentTextArea.append(txt, String.join(";", finalStyles));
             });
@@ -310,7 +302,7 @@ public class MainController implements Initializable {
             this.nextButton.setDisable(false);
         }
         this.documentPreviewPane.setShowDetailNode(true);
-        scrollAndSelectContentTo(0, 0);
+        scrollToAndSelect(0, 0);
     }
 
     private Map<String, Collection<String>> extractDocumentStyles() {
@@ -364,7 +356,7 @@ public class MainController implements Initializable {
     }
 
     private void defineDocumentTableColumns() {
-        this.documentPathColumn.prefWidthProperty().bind(getPathColumnSize());
+        this.documentPathColumn.prefWidthProperty().bind(getFileNameColumnSize());
         this.documentPathColumn.setCellValueFactory(
                 c -> new ReadOnlyStringWrapper(c.getValue().getPath()));
         this.documentSizeColumn.setCellValueFactory(c ->
@@ -372,15 +364,15 @@ public class MainController implements Initializable {
                         FileUtils.byteCountToDisplaySize(c.getValue().getFileSize())));
         this.documentCreationTimeColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
-                        DisplayUtils.dateTimeFormatter.format(
+                        FTSDocsApplication.DATE_TIME_FORMATTER.format(
                                 c.getValue().getCreationTime().toInstant())));
         this.documentModificationTimeColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
-                        DisplayUtils.dateTimeFormatter.format(
+                        FTSDocsApplication.DATE_TIME_FORMATTER.format(
                                 c.getValue().getLastModifiedTime().toInstant())));
     }
 
-    private ObservableValue<? extends Number> getPathColumnSize() {
+    private ObservableValue<? extends Number> getFileNameColumnSize() {
         return documentTable.widthProperty()
                 .subtract(documentSizeColumn.widthProperty())
                 .subtract(documentCreationTimeColumn.widthProperty())

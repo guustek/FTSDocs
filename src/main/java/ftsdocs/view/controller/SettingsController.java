@@ -31,17 +31,18 @@ import ftsdocs.view.ViewManager;
 @Lazy
 public class SettingsController implements Initializable {
 
-    private static boolean shouldReload = true;
-
     @FXML
     private PropertySheet propertySheet;
 
     private final Configuration configuration;
 
+    private Configuration tempConfiguration;
+
     private final ViewManager viewManager;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        tempConfiguration = new Configuration(configuration);
         this.propertySheet.getStyleClass().clear();
         this.propertySheet.getStyleClass().add("background");
         initializeProperties();
@@ -49,7 +50,21 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void resetClick() {
+        tempConfiguration.copyFrom(configuration);
+        viewManager.changeScene(View.SETTINGS);
+    }
+
+    @FXML
+    private void resetDefaultClick() {
         configuration.reset();
+        configuration.writeToFile();
+        tempConfiguration.copyFrom(configuration);
+        viewManager.changeScene(View.SETTINGS);
+    }
+
+    @FXML
+    private void applyClick() {
+        configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
         viewManager.changeScene(View.SETTINGS);
     }
@@ -63,16 +78,16 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         boolean.class,
                         "Enable dark mode",
+                        "Enables/disables dark theme of application.",
                         Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
-                        return configuration.isEnableDarkMode();
+                        return tempConfiguration.isEnableDarkMode();
                     }
 
                     @Override
                     public void setValue(Object value) {
-                        configuration.setEnableDarkMode((boolean) value);
-                        configuration.writeToFile();
+                        tempConfiguration.setEnableDarkMode((boolean) value);
                     }
                 });
 
@@ -80,16 +95,16 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         Color.class,
                         "Phrase highlight color",
+                        "Color that will be used to highlight found parts of document content in it's preview.",
                         Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
-                        return configuration.getHighlightColor();
+                        return tempConfiguration.getHighlightColor();
                     }
 
                     @Override
                     public void setValue(Object value) {
-                        configuration.setHighlightColor((Color) value);
-                        configuration.writeToFile();
+                        tempConfiguration.setHighlightColor((Color) value);
                     }
                 });
 
@@ -97,16 +112,16 @@ public class SettingsController implements Initializable {
                 new PropertyItem(
                         int.class,
                         "Document content font size",
+                        "Font size of text displayed in document content preview.",
                         Categories.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
-                        return configuration.getContentFontSize();
+                        return tempConfiguration.getContentFontSize();
                     }
 
                     @Override
                     public void setValue(Object value) {
-                        configuration.setContentFontSize((int) value);
-                        configuration.writeToFile();
+                        tempConfiguration.setContentFontSize((int) value);
                     }
                 });
 
@@ -118,16 +133,16 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         int.class,
                         "Max search results",
+                        "Max number of documents returned from query.",
                         Categories.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
-                        return configuration.getMaxSearchResults();
+                        return tempConfiguration.getMaxSearchResults();
                     }
 
                     @Override
                     public void setValue(Object value) {
-                        configuration.setMaxSearchResults((int) value);
-                        configuration.writeToFile();
+                        tempConfiguration.setMaxSearchResults((int) value);
                     }
                 });
 
@@ -135,16 +150,16 @@ public class SettingsController implements Initializable {
                 .add(new PropertyItem(
                         int.class,
                         "Max phrase highlights",
+                        "Max number of found parts of document content to be highlighted in preview.",
                         Categories.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
-                        return configuration.getMaxPhraseHighlights();
+                        return tempConfiguration.getMaxPhraseHighlights();
                     }
 
                     @Override
                     public void setValue(Object value) {
-                        configuration.setMaxPhraseHighlights((int) value);
-                        configuration.writeToFile();
+                        tempConfiguration.setMaxPhraseHighlights((int) value);
                     }
                 });
 
@@ -153,21 +168,50 @@ public class SettingsController implements Initializable {
         //region Indexing
 
         propertySheet.getItems().add(
-                new PropertyItem(Set.class, "Document types", Categories.INDEXING.getDisplayName(),
+                new PropertyItem(
+                        boolean.class,
+                        "Enable file watcher",
+                        """
+                                Enable/disable automatic updates of indices based on file system events.
+                                Improves performance if disabled, but any changes in the file system will be updated only after application is restarted or location is re-indexed.
+                                """,
+                        Categories.INDEXING.getDisplayName(),
+                        null) {
+                    @Override
+                    public Object getValue() {
+                        return tempConfiguration.isEnableFileWatcher();
+                    }
+
+                    @Override
+                    public void setValue(Object value) {
+                        tempConfiguration.setEnableFileWatcher(((boolean) value));
+                    }
+                }
+        );
+
+        propertySheet.getItems().add(
+                new PropertyItem(
+                        Set.class,
+                        "Document types",
+                        """
+                                Set of document types to be indexed and searched upon.
+                                Indexing a single file with different extension will still index that file but it won't show in the results.
+                                """,
+                        Categories.INDEXING.getDisplayName(),
                         CheckComboBoxEditor.class) {
+
                     @Override
                     public Object getValue() {
                         return new SimpleListProperty<>(FXCollections.observableArrayList(
-                                configuration.getDocumentTypes()));
+                                tempConfiguration.getDocumentTypes()));
                     }
 
                     @SuppressWarnings("unchecked")
                     @Override
                     public void setValue(Object value) {
                         Collection<DocumentType> selectedDocumentTypes = ((Collection<DocumentType>) value);
-                        configuration.getDocumentTypes().forEach(
+                        tempConfiguration.getDocumentTypes().forEach(
                                 doc -> doc.setEnabled(selectedDocumentTypes.contains(doc)));
-                        configuration.writeToFile();
                     }
                 });
 

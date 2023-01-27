@@ -14,7 +14,7 @@ import ftsdocs.model.Document;
 
 @Service
 @Slf4j
-public class TikaContentExtractor implements ContentExtractor{
+public class TikaContentExtractor implements ContentExtractor {
 
     private final Tika tika;
 
@@ -47,16 +47,11 @@ public class TikaContentExtractor implements ContentExtractor{
     }
 
     private String getContent(File file) throws Exception {
-        try {
-            log.info("Detected type {} for file {}", file, tika.detect(file.getName()));
-            if (file.length() == 0) {
-                log.info("Zero byte file - {}, returning empty content", file);
-                return "";
-            }
-            return tika.parseToString(file);
-        } catch (Exception e) {
-            log.error("Error while extracting content from {}", file, e);
-            throw new Exception(e);
+        log.info("Detected type {} for file {}", file, tika.detect(file.getName()));
+        if (file.length() == 0) {
+            log.info("Zero byte file - {}, returning empty content", file);
+            return "";
         }
+        return tika.parseToString(file);
     }
 }

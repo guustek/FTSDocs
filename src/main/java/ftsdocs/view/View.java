@@ -4,5 +4,4 @@ public enum View {
     SPLASH,
     MAIN,
     SETTINGS;
-
 }

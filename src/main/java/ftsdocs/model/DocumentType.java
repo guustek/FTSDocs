@@ -2,13 +2,13 @@ package ftsdocs.model;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FilenameUtils;
 
 @Getter
 @Setter
@@ -17,31 +17,29 @@ public class DocumentType implements Checkable {
 
     private String name;
 
-    private Set<String> extensions;
-
     private boolean enabled;
 
-    public DocumentType(String name, String... extensions) {
-        this(name, Arrays.stream(extensions).collect(Collectors.toSet()));
+    private LinkedHashSet<String> extensions;
+
+    public DocumentType(String name, boolean enabled, String... extensions) {
+        this(name, enabled, Arrays.stream(extensions)
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
     }
 
-    public DocumentType(String name, Collection<String> extensions) {
+    public DocumentType(String name, boolean enabled, Collection<String> extensions) {
         this.name = name;
-        this.enabled = true;
+        this.enabled = enabled;
         this.extensions = extensions.stream()
                 .map(ext -> {
-                    String actualExtension = ext.toLowerCase();
-                    if (!ext.startsWith(".")) {
-                        actualExtension = "." + actualExtension;
-                    }
-                    return actualExtension;
+                    String actualExtension = FilenameUtils.getExtension("." + ext.toLowerCase());
+                    return "*." + actualExtension;
                 })
-                .collect(Collectors.toCollection(HashSet::new));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
     public String toString() {
-        return this.name + " (" + String.join(" | ", this.extensions) + ")";
+        return this.name + " (" + String.join(";", this.extensions) + ")";
     }
 
     @Override

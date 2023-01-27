@@ -23,8 +23,6 @@ public class Document {
     private Date creationTime;
     @Field
     private Date lastModifiedTime;
-//    @Field
-//    private double score;
     @Setter
     private String highlight;
 
@@ -33,7 +31,7 @@ public class Document {
         this.path = path;
         this.content = content;
         this.fileSize = fileSize;
-        this.extension = extension;
+        this.extension = extension.toLowerCase();
         this.creationTime = creationTime;
         this.lastModifiedTime = lastModifiedTime;
     }

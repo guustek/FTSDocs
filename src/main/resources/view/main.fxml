@@ -9,7 +9,10 @@
 <?import org.fxmisc.flowless.*?>
 <?import org.fxmisc.richtext.*?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.view.controller.MainController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0"
+  minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background"
+  xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="ftsdocs.view.controller.MainController">
   <left>
     <fx:include source="menu.fxml"/>
   </left>
@@ -67,10 +70,7 @@
         </masterNode>
         <detailNode>
           <VBox>
-            <HBox spacing="10.0" styleClass="matches-box">
-              <VBox.margin>
-                <Insets bottom="10.0" top="10.0"/>
-              </VBox.margin>
+            <HBox spacing="20.0" styleClass="matches-box">
               <Label fx:id="matchesCountLabel" alignment="CENTER" contentDisplay="CENTER"
                 maxHeight="Infinity" maxWidth="100" minWidth="100" prefWidth="100"
                 textAlignment="CENTER"/>
@@ -78,16 +78,17 @@
                 focusTraversable="false" mnemonicParsing="false"
                 onMouseClicked="#previousHighlightClick">
                 <tooltip>
-                  <Tooltip text="Previous occurrence"/>
+                  <Tooltip text="Previous highlight"/>
                 </tooltip>
               </Button>
               <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER"
                 focusTraversable="false" mnemonicParsing="false"
                 onMouseClicked="#nextHighlightClick">
                 <tooltip>
-                  <Tooltip text="Next occurrence"/>
+                  <Tooltip text="Next highlight"/>
                 </tooltip>
               </Button>
+              <Region HBox.hgrow="ALWAYS"/>
               <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false"
                 mnemonicParsing="false" onMouseClicked="#closePreviewClick">
                 <tooltip>

@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" monitorInterval="30">
   <Properties>
-    <Property name="LOG_PATTERN">%d{HH:mm:ss.SSS}  %highlight{%-5level}  [%t]  %logger{36}  :  %msg%n</Property>
+    <Property name="LOG_PATTERN">
+      %d{dd/MM/yyyy HH:mm:ss} %highlight{%-5level} [%t] %logger{36} : %msg%n
+    </Property>
+    <Property name="LOG_DIR">FTSDocs/log</Property>
   </Properties>
   <Appenders>
     <Console name="console" target="SYSTEM_OUT" follow="true">
       <PatternLayout disableAnsi="false" pattern="${LOG_PATTERN}{TRACE=white}"/>
     </Console>
+    <RollingFile name="file" filePattern="${LOG_DIR}/FTSDocs-%d{yyyyMMdd-HHmm}-%i.log">
+      <PatternLayout disableAnsi="true" pattern="${LOG_PATTERN}"/>
+      <Policies>
+        <OnStartupTriggeringPolicy minSize="0"/>
+      </Policies>
+      <DirectWriteRolloverStrategy>
+        <Delete basePath="${LOG_DIR}" maxDepth="1">
+          <IfLastModified age="20s" />
+        </Delete>
+      </DirectWriteRolloverStrategy>
+    </RollingFile>
   </Appenders>
   <Loggers>
     <Root level="info">
-      <AppenderRef ref="console"/>
+      <AppenderRef ref="console" level="info"/>
+      <AppenderRef ref="file" level="info"/>
     </Root>
   </Loggers>
 </Configuration>

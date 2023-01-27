@@ -14,9 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 public class IndexedFilesVisitor implements FileTreeVisitor {
 
     private final Path indexedPath;
+    private final Configuration configuration;
 
-    public IndexedFilesVisitor(Path indexedPath) {
+    public IndexedFilesVisitor(Path indexedPath, Configuration configuration) {
         this.indexedPath = indexedPath;
+        this.configuration = configuration;
     }
 
     @Override
@@ -26,7 +28,6 @@ public class IndexedFilesVisitor implements FileTreeVisitor {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                     throws IOException {
-
                 if (indexedPath.toFile().isFile()) {
                     //Is parent of indexed file
                     if (dir.equals(indexedPath.getParent())) {
@@ -60,7 +61,9 @@ public class IndexedFilesVisitor implements FileTreeVisitor {
                 }
                 //Is file in indexed directory subtree
                 else if (indexedPath.toFile().isDirectory() && file.startsWith(indexedPath)) {
-                    onFile.call(file);
+                    if (configuration.isFileFormatSupported(file.toFile())) {
+                        onFile.call(file);
+                    }
                     return FileVisitResult.CONTINUE;
                 }
                 return FileVisitResult.CONTINUE;
@@ -76,6 +79,9 @@ public class IndexedFilesVisitor implements FileTreeVisitor {
                 return FileVisitResult.CONTINUE;
             }
         };
+        log.info("{}, started walking file tree of {}",
+                Thread.currentThread().getName(),
+                indexedPath);
         Files.walkFileTree(file, visitor);
     }
 }
