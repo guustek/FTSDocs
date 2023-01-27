@@ -56,8 +56,10 @@
         <masterNode>
           <TableView fx:id="documentTable" VBox.vgrow="ALWAYS">
             <columns>
+              <TableColumn fx:id="indexColumn" text="#" editable="false" maxWidth="65.0"
+                minWidth="65.0" prefWidth="65.0" resizable="false"/>
               <TableColumn fx:id="documentPathColumn" editable="false"
-                maxWidth="1.7976931348623157E308" minWidth="197.0" prefWidth="197.0"
+                maxWidth="1.7976931348623157E308" minWidth="132.0" prefWidth="132.0"
                 resizable="false" text="Path"/>
               <TableColumn fx:id="documentSizeColumn" editable="false" maxWidth="100.0"
                 minWidth="100.0" prefWidth="100.0" resizable="false" text="Size"/>

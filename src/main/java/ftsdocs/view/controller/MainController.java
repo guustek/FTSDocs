@@ -28,6 +28,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -100,6 +101,8 @@ public class MainController implements Initializable {
     @FXML
     private TableView<Document> documentTable;
     @FXML
+    private TableColumn<Document, Integer> indexColumn;
+    @FXML
     private TableColumn<Document, String> documentPathColumn;
     @FXML
     private TableColumn<Document, String> documentSizeColumn;
@@ -167,18 +170,15 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Color color = configuration.isEnableDarkMode() ? Color.BLACK : Color.WHITE;
+        Color color = configuration.isEnableDarkMode()
+                ? Color.rgb(23, 23, 23)
+                : Color.rgb(233, 233, 233);
+        double width = 1.5;
         documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
-                        CornerRadii.EMPTY, new BorderWidths(0.5))));
+                        CornerRadii.EMPTY, new BorderWidths(-1, width, width, width))));
         defineDocumentTableColumns();
         this.documentTable.setItems(documents);
-        this.documentTable.setEditable(false);
-        this.documentTable.setRowFactory(param -> {
-            TableRow<Document> row = new TableRow<>();
-            row.setOnMouseClicked(this::handleDocumentClick);
-            return row;
-        });
     }
 
     private void search() {
@@ -355,7 +355,22 @@ public class MainController implements Initializable {
                 (int) (color.getBlue() * 255) + ") ";
     }
 
+    @SuppressWarnings("java:S110")
     private void defineDocumentTableColumns() {
+        this.documentTable.setEditable(false);
+        this.documentTable.setRowFactory(param -> {
+            TableRow<Document> row = new TableRow<>();
+            row.setOnMouseClicked(this::handleDocumentClick);
+            return row;
+        });
+
+        this.indexColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(String.valueOf(getIndex() + 1));
+            }
+        });
         this.documentPathColumn.prefWidthProperty().bind(getFileNameColumnSize());
         this.documentPathColumn.setCellValueFactory(
                 c -> new ReadOnlyStringWrapper(c.getValue().getPath()));
@@ -374,6 +389,7 @@ public class MainController implements Initializable {
 
     private ObservableValue<? extends Number> getFileNameColumnSize() {
         return documentTable.widthProperty()
+                .subtract(indexColumn.widthProperty())
                 .subtract(documentSizeColumn.widthProperty())
                 .subtract(documentCreationTimeColumn.widthProperty())
                 .subtract(documentModificationTimeColumn.widthProperty())

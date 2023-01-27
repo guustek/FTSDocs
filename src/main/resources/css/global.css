@@ -8,11 +8,12 @@
 
 .matches-box {
   -fx-border-color: rgb(233, 233, 233);
-  -fx-border-width: 2px;
+  -fx-border-width: 1.5px;
   -fx-padding: 10px;
 }
 
 /* region notification */
+
 .notification-bar > .pane {
   -fx-max-width: 50;
   -fx-min-width: 50;
