@@ -100,7 +100,7 @@ public class SolrService implements FullTextSearchService {
 
     public void deleteFromIndex(Collection<Path> paths) {
         if (paths.isEmpty()) {
-            log.info("Nothing to {}", paths);
+            log.info("Nothing to delete");
             return;
         }
         try {
@@ -121,10 +121,12 @@ public class SolrService implements FullTextSearchService {
             protected Collection<Document> call() {
                 log.info("{} started indexing task for locations: {}",
                         Thread.currentThread().getName(),
-                        FTSDocsApplication.GSON.toJson(indexLocations));
+                        FTSDocsApplication.GSON.toJson(
+                                indexLocations.stream().map(File::getAbsolutePath).toList()));
 
                 Collection<File> actualFiles = indexLocations.stream()
                         .flatMap(file -> readFileTree(file).stream())
+                        .filter(configuration::isFileFormatSupported)
                         .toList();
 
                 Collection<Document> documents = doIndexing(actualFiles);
@@ -195,8 +197,8 @@ public class SolrService implements FullTextSearchService {
         stopWatch.stop();
         log.info("{} finished reading file tree of {} in {}, Found {} files",
                 Thread.currentThread().getName(),
-                stopWatch,
                 file,
+                stopWatch,
                 result.size());
         return result;
     }

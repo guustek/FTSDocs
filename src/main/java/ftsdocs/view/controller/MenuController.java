@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -17,6 +18,9 @@ import javafx.stage.FileChooser.ExtensionFilter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.HyperlinkLabel;
+import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -88,8 +92,8 @@ public class MenuController implements Initializable {
     }
 
     @FXML
-    private void indexedFilesClick() {
-        //viewManager.changeScene(Views.MAIN);
+    private void indicesClick() {
+        viewManager.changeScene(View.INDICES);
     }
 
     @FXML
@@ -112,9 +116,22 @@ public class MenuController implements Initializable {
                     Collection<Document> value = ((Collection<Document>) event.getSource()
                             .getValue());
 
-                    this.viewManager.showNotification("Information",
-                            "Indexed " + value.size() + " files. Check Indexed files for details");
+                    HyperlinkLabel indicesViewLink = new HyperlinkLabel(
+                            "Indexed " + value.size() + " files. "
+                                    + "Check ["
+                                    + StringUtils.capitalize(View.INDICES.name().toLowerCase())
+                                    + "] for details");
+                    indicesViewLink.setFocusTraversable(false);
+                    indicesViewLink.setOnAction(linkEvent -> {
+                        Hyperlink source = ((Hyperlink) linkEvent.getSource());
+                        viewManager.changeScene(View.valueOf(source.getText().toUpperCase()));
+                    });
 
+                    Notifications.create()
+                            .owner(root)
+                            .title("Information")
+                            .graphic(indicesViewLink)
+                            .show();
                 });
     }
 }

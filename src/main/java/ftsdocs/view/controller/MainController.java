@@ -177,8 +177,7 @@ public class MainController implements Initializable {
         documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(-1, width, width, width))));
-        defineDocumentTableColumns();
-        this.documentTable.setItems(documents);
+        defineDocumentTable();
     }
 
     private void search() {
@@ -356,7 +355,8 @@ public class MainController implements Initializable {
     }
 
     @SuppressWarnings("java:S110")
-    private void defineDocumentTableColumns() {
+    private void defineDocumentTable() {
+        this.documentTable.setItems(documents);
         this.documentTable.setEditable(false);
         this.documentTable.setRowFactory(param -> {
             TableRow<Document> row = new TableRow<>();
@@ -368,7 +368,10 @@ public class MainController implements Initializable {
             @Override
             protected void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(String.valueOf(getIndex() + 1));
+                if (!empty) {
+                    setText(String.valueOf(getIndex() + 1));
+                }
+
             }
         });
         this.documentPathColumn.prefWidthProperty().bind(getFileNameColumnSize());
