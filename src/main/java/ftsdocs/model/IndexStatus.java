@@ -7,7 +7,8 @@ public enum IndexStatus {
     READING_FILE_TREE("Reading file tree"),
     EXTRACTING_CONTENT("Extracting content"),
     INDEXING("Indexing"),
-    INDEXED("Indexed");
+    INDEXED("Indexed"),
+    UNKNOWN("");
 
     @Getter
     private final String displayName;

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,8 +25,11 @@ import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.Configuration;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.WatcherStatus;
 import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
@@ -103,14 +107,19 @@ public class MenuController implements Initializable {
 
     @SuppressWarnings("unchecked")
     private void index(List<File> files) {
-        this.configuration.getIndexedLocations()
-                .addAll(files.stream()
-                        .map(File::getAbsolutePath)
-                        .toList());
+        List<IndexLocation> indexLocations = files.stream()
+                .map(file -> new IndexLocation(
+                        file,
+                        IndexStatus.UNKNOWN,
+                        WatcherStatus.DISABLED))
+                .toList();
 
+        this.configuration.getIndexedLocations().putAll(indexLocations.stream()
+                .collect(Collectors.toMap(loc -> loc.getRoot().getAbsolutePath(), loc -> loc)));
         this.configuration.writeToFile();
-        this.ftsService.indexFiles(
-                files,
+
+        this.ftsService.indexLocations(
+                indexLocations,
                 this.configuration.isEnableFileWatcher(),
                 event -> {
                     Collection<Document> value = ((Collection<Document>) event.getSource()

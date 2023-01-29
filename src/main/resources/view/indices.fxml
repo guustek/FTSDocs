@@ -32,8 +32,7 @@
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>
         <columns>
-          <TreeTableColumn fx:id="indexColumn" editable="false" maxWidth="65.0" minWidth="65.0" prefWidth="65.0" resizable="false" text="#" />
-          <TreeTableColumn fx:id="locationColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="132.0" prefWidth="132.0" resizable="false" text="Location" />
+          <TreeTableColumn fx:id="locationColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="427.0" prefWidth="427.0" resizable="false" text="Location" />
           <TreeTableColumn fx:id="indexStatusColumn" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Indexing status" />
           <TreeTableColumn fx:id="watcherStatusColumn" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Watcher status" />
         </columns>

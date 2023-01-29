@@ -5,6 +5,8 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import ftsdocs.configuration.Configuration;
+
 public class ServerBeanCondition implements Condition {
 
     @Override

@@ -1,24 +1,27 @@
-package ftsdocs;
+package ftsdocs.configuration;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
+import com.google.gson.annotations.JsonAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.DocumentType;
+import ftsdocs.model.IndexLocation;
 
 @Slf4j
 @Component
@@ -59,10 +62,11 @@ public class Configuration {
 
     //endregion Indexing
 
-    private LinkedHashSet<String> indexedLocations;
+    @JsonAdapter(IndexedLocationsAdapter.class)
+    private LinkedHashMap<String, IndexLocation> indexedLocations;
 
     public Configuration() {
-        this.indexedLocations = new LinkedHashSet<>();
+        this.indexedLocations = new LinkedHashMap<>();
         reset();
     }
 
@@ -90,7 +94,7 @@ public class Configuration {
         this.documentTypes = configuration.getDocumentTypes().stream()
                 .map(doc -> new DocumentType(doc.getName(), doc.isEnabled(), doc.getExtensions()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        this.indexedLocations = new LinkedHashSet<>(configuration.getIndexedLocations());
+        this.indexedLocations = new LinkedHashMap<>(configuration.getIndexedLocations());
     }
 
     public boolean isFileFormatSupported(File file) {
@@ -110,14 +114,4 @@ public class Configuration {
         }
     }
 
-    public enum Categories {
-
-        APPEARANCE,
-        SEARCHING,
-        INDEXING;
-
-        public String getDisplayName() {
-            return StringUtils.capitalize(this.name().toLowerCase().replace("_", " "));
-        }
-    }
 }

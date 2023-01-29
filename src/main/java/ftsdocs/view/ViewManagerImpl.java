@@ -14,7 +14,7 @@ import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.Configuration;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.FTSDocsApplication;
 
 @Slf4j

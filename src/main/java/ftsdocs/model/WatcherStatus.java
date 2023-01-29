@@ -4,8 +4,9 @@ import lombok.Getter;
 
 public enum WatcherStatus {
     DISABLED("Disabled"),
-    READING_FILE_TREE("Reading file tree"),
-    WATCHING("Watching");
+    BUILDING_WATCHER("Building watcher"),
+    WATCHING("Watching"),
+    UNKNOWN("");
 
     @Getter
     private final String displayName;

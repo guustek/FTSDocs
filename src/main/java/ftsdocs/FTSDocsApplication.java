@@ -34,6 +34,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
+import ftsdocs.configuration.Configuration;
 import ftsdocs.server.FullTextSearchServer;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
@@ -56,7 +57,7 @@ public class FTSDocsApplication extends Application {
     public static final File CONFIG_FILE = new File(FTSDocsApplication.HOME_DIR, "config.json");
 
     public static final Gson GSON = buildGson();
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = getDATE_TIME_FORMATTER();
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = buildDateTimeFormatter();
 
     @Getter
     private ConfigurableApplicationContext context;
@@ -146,7 +147,7 @@ public class FTSDocsApplication extends Application {
         thread.start();
     }
 
-    private ftsdocs.Configuration loadConfiguration() {
+    private Configuration loadConfiguration() {
         if (HOME_DIR.exists() && CONFIG_FILE.exists()) {
             try {
                 String configJson = Files.readString(
@@ -180,7 +181,7 @@ public class FTSDocsApplication extends Application {
                 .create();
     }
 
-    private static DateTimeFormatter getDATE_TIME_FORMATTER() {
+    private static DateTimeFormatter buildDateTimeFormatter() {
         return DateTimeFormatter.ofLocalizedDateTime(
                         FormatStyle.MEDIUM)
                 .withLocale(Locale.getDefault())

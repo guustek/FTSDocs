@@ -8,6 +8,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
 import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
 
 public interface FullTextSearchService {
 
@@ -15,6 +16,9 @@ public interface FullTextSearchService {
 
     void deleteFromIndex(Collection<Path> path);
 
-    void indexFiles(Collection<File> files, boolean updateWatcher,
+    void indexLocations(Collection<IndexLocation> locations, boolean updateWatcher,
             EventHandler<WorkerStateEvent> successHandler);
+
+    void updateFile(IndexLocation indexLocation, File file);
+
 }

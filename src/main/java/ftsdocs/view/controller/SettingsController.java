@@ -18,8 +18,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import ftsdocs.CheckComboBoxEditor;
-import ftsdocs.Configuration;
-import ftsdocs.Configuration.Categories;
+import ftsdocs.configuration.Category;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.model.DocumentType;
 import ftsdocs.model.PropertyItem;
 import ftsdocs.view.View;
@@ -79,7 +79,7 @@ public class SettingsController implements Initializable {
                         boolean.class,
                         "Enable dark mode",
                         "Enables/disables dark theme of application.",
-                        Categories.APPEARANCE.getDisplayName()) {
+                        Category.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.isEnableDarkMode();
@@ -96,7 +96,7 @@ public class SettingsController implements Initializable {
                         Color.class,
                         "Phrase highlight color",
                         "Color that will be used to highlight found parts of document content in it's preview.",
-                        Categories.APPEARANCE.getDisplayName()) {
+                        Category.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.getHighlightColor();
@@ -113,7 +113,7 @@ public class SettingsController implements Initializable {
                         int.class,
                         "Document content font size",
                         "Font size of text displayed in document content preview.",
-                        Categories.APPEARANCE.getDisplayName()) {
+                        Category.APPEARANCE.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.getContentFontSize();
@@ -134,7 +134,7 @@ public class SettingsController implements Initializable {
                         int.class,
                         "Max search results",
                         "Max number of documents returned from query.",
-                        Categories.SEARCHING.getDisplayName()) {
+                        Category.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.getMaxSearchResults();
@@ -151,7 +151,7 @@ public class SettingsController implements Initializable {
                         int.class,
                         "Max phrase highlights",
                         "Max number of found parts of document content to be highlighted in preview.",
-                        Categories.SEARCHING.getDisplayName()) {
+                        Category.SEARCHING.getDisplayName()) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.getMaxPhraseHighlights();
@@ -175,7 +175,7 @@ public class SettingsController implements Initializable {
                                 Enable/disable automatic updates of indices based on file system events.
                                 Improves performance if disabled, but any changes in the file system will be updated only after application is restarted or location is re-indexed.
                                 """,
-                        Categories.INDEXING.getDisplayName(),
+                        Category.INDEXING.getDisplayName(),
                         null) {
                     @Override
                     public Object getValue() {
@@ -197,7 +197,7 @@ public class SettingsController implements Initializable {
                                 Set of document types to be indexed and searched upon.
                                 Indexing a single file with different extension will still index that file but it won't show in the results.
                                 """,
-                        Categories.INDEXING.getDisplayName(),
+                        Category.INDEXING.getDisplayName(),
                         CheckComboBoxEditor.class) {
 
                     @Override

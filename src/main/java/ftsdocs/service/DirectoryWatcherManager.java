@@ -19,14 +19,17 @@ import io.methvin.watcher.hashing.FileHasher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
-import ftsdocs.Configuration;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.IndexedFilesVisitor;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.WatcherStatus;
 
 @Slf4j
 public class DirectoryWatcherManager {
 
     private final Configuration configuration;
-    private final Map<Path, DirectoryWatcher> watchers;
+    private final Map<IndexLocation, DirectoryWatcher> watchers;
     private final ExecutorService executor;
     private final FullTextSearchService ftsService;
 
@@ -38,45 +41,50 @@ public class DirectoryWatcherManager {
                 new CustomizableThreadFactory("File watcher thread-"));
     }
 
-    public void updateWatchers(Collection<File> indexLocations) {
+    public void updateWatchers(Collection<IndexLocation> indexLocations) {
         Task<Void> updateWatchersTask = new Task<>() {
             @Override
             protected Void call() {
                 indexLocations.parallelStream()
-                        .filter(file -> configuration.isFileFormatSupported(file) || file.isDirectory())
-                        .forEach(file -> updateWatcher(file.toPath()));
+                        .filter(loc -> configuration.isFileFormatSupported(loc.getRoot())
+                                || loc.getRoot().isDirectory())
+                        .forEach(loc -> updateWatcher(loc));
                 return null;
             }
         };
         this.executor.execute(updateWatchersTask);
     }
 
-    private void updateWatcher(Path sourcePath) {
+    private void updateWatcher(IndexLocation location) {
         try {
-            DirectoryWatcher directoryWatcher = this.watchers.get(sourcePath);
+            DirectoryWatcher directoryWatcher = this.watchers.get(location);
             if (directoryWatcher != null) {
                 directoryWatcher.close();
             }
         } catch (IOException e) {
-            log.error("Failed closing watcher for {}", sourcePath);
+            log.error("Failed closing watcher for {}", location.getRoot());
         }
 
         try {
+            location.setWatcherStatus(WatcherStatus.BUILDING_WATCHER);
             DirectoryWatcher watcher = DirectoryWatcher.builder()
-                    .path(sourcePath.getParent())
-                    .listener(event -> handleFileChangeEvent(sourcePath, event))
+                    .path(location.getRoot().toPath().getParent())
+                    .listener(event -> handleFileChangeEvent(location.getRoot().toPath(), event))
                     .fileHasher(FileHasher.LAST_MODIFIED_TIME)
-                    .fileTreeVisitor(new IndexedFilesVisitor(sourcePath, configuration))
+                    .fileTreeVisitor(
+                            new IndexedFilesVisitor(location.getRoot().toPath(), configuration))
                     .build();
-            this.watchers.put(sourcePath, watcher);
+            this.watchers.put(location, watcher);
             watcher.watchAsync(executor);
+            location.setWatcherStatus(WatcherStatus.WATCHING);
             log.info("{} started watcher for {} location",
-                    Thread.currentThread().getName(), sourcePath);
+                    Thread.currentThread().getName(), location.getRoot());
         } catch (Exception e) {
             log.error("Building directory watcher failed", e);
         }
     }
 
+    // TODO: 29.01.2023 NEED TO TEST THIS BULLSHIT
     private void handleFileChangeEvent(Path sourcePath, DirectoryChangeEvent event) {
         if (event.eventType() == EventType.OVERFLOW) {
             log.info("FileSystemEvent - Type: {}, source path: {}, root path: {}, path: {}",
@@ -90,12 +98,29 @@ public class DirectoryWatcherManager {
                 event.eventType(), sourcePath, event.rootPath(), event.path());
 
         switch (event.eventType()) {
-            case CREATE, MODIFY ->
-                    this.ftsService.indexFiles(Collections.singletonList(event.path().toFile()),
-                            false, null);
-            case DELETE -> this.ftsService.deleteFromIndex(Collections.singletonList(event.path()));
+            case CREATE, MODIFY -> {
+                IndexLocation indexLocation = this.configuration.getIndexedLocations()
+                        .get(sourcePath.toString());
+                if (indexLocation != null) {
+                    File file = event.path().toFile();
+                    ftsService.updateFile(indexLocation, file);
+                }
+            }
+            case DELETE -> {
+                IndexLocation indexLocation = this.configuration.getIndexedLocations()
+                        .get(sourcePath.toString());
+                if (indexLocation != null) {
+                    indexLocation.setIndexStatus(IndexStatus.UPDATING);
+                    Path path = event.path();
+                    indexLocation.getIndexedFiles().remove(path.toFile());
+                    this.ftsService.deleteFromIndex(Collections.singletonList(path));
+                    indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                }
+
+            }
             default -> throw new IllegalStateException("Unexpected value: " + event.eventType());
         }
+
     }
 
     private boolean shouldHandleFileSystemEvent(Path sourcePath,

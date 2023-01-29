@@ -53,7 +53,7 @@ import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.Configuration;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.Document;
 import ftsdocs.model.HighlightSnippet;

@@ -27,10 +27,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
-import ftsdocs.Configuration;
+import ftsdocs.configuration.Configuration;
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.Document;
 import ftsdocs.model.FieldName;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
 import ftsdocs.server.FullTextSearchServer;
 
 @Slf4j
@@ -56,13 +58,9 @@ public class SolrService implements FullTextSearchService {
                 new CustomizableThreadFactory("Indexing thread-"));
         this.watcherManager = new DirectoryWatcherManager(this, this.configuration);
 
-        List<File> indexLocations = this.configuration.getIndexedLocations().stream()
-                .map(File::new)
-                .toList();
-
         updateIndices();
         if (this.configuration.isEnableFileWatcher()) {
-            this.watcherManager.updateWatchers(indexLocations);
+            this.watcherManager.updateWatchers(this.configuration.getIndexedLocations().values());
         }
 
     }
@@ -89,15 +87,6 @@ public class SolrService implements FullTextSearchService {
         return documents;
     }
 
-    public void deleteFromIndex(Path path) {
-        try {
-            this.client.deleteById(path.toString());
-            this.client.commit();
-        } catch (Exception e) {
-            log.error("Failed deleting {}", path);
-        }
-    }
-
     public void deleteFromIndex(Collection<Path> paths) {
         if (paths.isEmpty()) {
             log.info("Nothing to delete");
@@ -111,8 +100,8 @@ public class SolrService implements FullTextSearchService {
         }
     }
 
-    public void indexFiles(
-            Collection<File> indexLocations,
+    public void indexLocations(
+            Collection<IndexLocation> locations,
             boolean updateWatcher,
             EventHandler<WorkerStateEvent> successHandler) {
 
@@ -122,14 +111,22 @@ public class SolrService implements FullTextSearchService {
                 log.info("{} started indexing task for locations: {}",
                         Thread.currentThread().getName(),
                         FTSDocsApplication.GSON.toJson(
-                                indexLocations.stream().map(File::getAbsolutePath).toList()));
+                                locations.stream()
+                                        .map(loc -> loc.getRoot().getAbsolutePath())
+                                        .toList()));
 
-                Collection<File> actualFiles = indexLocations.stream()
-                        .flatMap(file -> readFileTree(file).stream())
-                        .filter(configuration::isFileFormatSupported)
+                Collection<File> actualFiles = locations.parallelStream()
+                        .flatMap(loc -> {
+                            loc.setIndexStatus(IndexStatus.READING_FILE_TREE);
+                            Collection<File> files = readFileTree(loc.getRoot()).stream()
+                                    .filter(configuration::isFileFormatSupported).toList();
+                            loc.getIndexedFiles().addAll(files);
+                            return files.stream();
+                        })
+
                         .toList();
 
-                Collection<Document> documents = doIndexing(actualFiles);
+                Collection<Document> documents = doIndexing(locations, actualFiles);
 
                 log.info("{} finished indexing task of {} documents",
                         Thread.currentThread().getName(),
@@ -143,9 +140,34 @@ public class SolrService implements FullTextSearchService {
         if (updateWatcher) {
             log.info("Starting watchers update task for locations: {}",
                     FTSDocsApplication.GSON.toJson(
-                            indexLocations.stream().map(File::getAbsolutePath)));
-            this.watcherManager.updateWatchers(indexLocations);
+                            locations.stream()
+                                    .map(loc -> loc.getRoot().getAbsolutePath())
+                                    .toList()));
+            this.watcherManager.updateWatchers(locations);
         }
+    }
+
+    public void updateFile(IndexLocation indexLocation, File file) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                try {
+                    indexLocation.setIndexStatus(IndexStatus.UPDATING);
+                    indexLocation.getIndexedFiles().add(file);
+                    Document document = contentExtractor.getDocumentFromFile(file);
+                    if (document != null) {
+                        client.addBean(document);
+                        client.commit();
+
+                    }
+                } catch (Exception e) {
+                    log.error("Error when updating {}", file, e);
+                }
+                indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                return null;
+            }
+        };
+        executor.execute(task);
     }
 
     private void updateIndices() {
@@ -153,12 +175,19 @@ public class SolrService implements FullTextSearchService {
             @Override
             protected Void call() {
                 log.info("{} started updating task", Thread.currentThread().getName());
-                Collection<File> actualFiles = configuration.getIndexedLocations().stream()
-                        .flatMap(location -> readFileTree(new File(location)).stream())
+                Collection<File> actualFiles = configuration.getIndexedLocations().values()
+                        .parallelStream()
+                        .flatMap(location -> {
+                            location.setIndexStatus(IndexStatus.UPDATING);
+                            Collection<File> files = readFileTree(location.getRoot()).stream()
+                                    .filter(configuration::isFileFormatSupported).toList();
+                            location.getIndexedFiles().addAll(files);
+                            return files.stream();
+                        })
                         .filter(configuration::isFileFormatSupported)
                         .toList();
                 deleteFilesNotInCollection(actualFiles);
-                doIndexing(actualFiles);
+                doIndexing(configuration.getIndexedLocations().values(), actualFiles);
                 return null;
             }
         };
@@ -166,10 +195,6 @@ public class SolrService implements FullTextSearchService {
     }
 
     private void deleteFilesNotInCollection(Collection<File> actualFiles) {
-        // TODO need to show that these dont exist anymore instead of deleting
-        this.configuration.getIndexedLocations().removeIf(path -> !new File(path).exists());
-        this.configuration.writeToFile();
-
         List<Path> toBeDeleted = searchDocuments("*").stream()
                 .map(doc -> Path.of(doc.getPath()))
                 .filter(path -> !actualFiles.contains(path.toFile()))
@@ -203,13 +228,16 @@ public class SolrService implements FullTextSearchService {
         return result;
     }
 
-    private Collection<Document> doIndexing(Collection<File> actualFiles) {
+    private Collection<Document> doIndexing(
+            Collection<IndexLocation> indexLocations,
+            Collection<File> actualFiles) {
 
         Collection<Document> documents = new ArrayList<>();
         try {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
+            indexLocations.forEach(loc -> loc.setIndexStatus(IndexStatus.EXTRACTING_CONTENT));
             documents = actualFiles.parallelStream()
                     .map(contentExtractor::getDocumentFromFile)
                     .filter(Objects::nonNull)
@@ -223,8 +251,12 @@ public class SolrService implements FullTextSearchService {
             stopWatch = new StopWatch();
             stopWatch.start();
 
+            indexLocations.forEach(loc -> loc.setIndexStatus(IndexStatus.INDEXING));
+
             client.addBeans(documents);
             client.commit();
+
+            indexLocations.forEach(loc -> loc.setIndexStatus(IndexStatus.INDEXED));
 
             stopWatch.stop();
             log.info("Finished indexing {} files in {}",
