@@ -82,9 +82,10 @@ public class IndicesController implements Initializable {
                 super.updateItem(item, empty);
                 if (!empty) {
                     setText(item);
-                    String tooltipText = IndexStatus.valueOf(
-                            item.replace(" ", "_").toUpperCase()).getDescription();
-                    setTooltip(new Tooltip(tooltipText));
+                    IndexStatus status = item.equals("")
+                            ? IndexStatus.UNKNOWN
+                            : IndexStatus.valueOf(item.replace(" ", "_").toUpperCase());
+                    setTooltip(new Tooltip(status.getDescription()));
                 } else {
                     setText(null);
                     setTooltip(null);
@@ -101,9 +102,10 @@ public class IndicesController implements Initializable {
                 super.updateItem(item, empty);
                 if (!empty) {
                     setText(item);
-                    String tooltipText = WatcherStatus.valueOf(
-                            item.replace(" ", "_").toUpperCase()).getDescription();
-                    setTooltip(new Tooltip(tooltipText));
+                    WatcherStatus status = item.equals("")
+                            ? WatcherStatus.UNKNOWN
+                            : WatcherStatus.valueOf(item.replace(" ", "_").toUpperCase());
+                    setTooltip(new Tooltip(status.getDescription()));
                 } else {
                     setText(null);
                     setTooltip(null);

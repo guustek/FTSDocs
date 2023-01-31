@@ -12,6 +12,10 @@
   -fx-padding: 10px;
 }
 
+.auto-complete-popup{
+
+}
+
 /* region notification */
 
 .notification-bar > .pane {

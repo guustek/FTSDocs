@@ -127,7 +127,7 @@ public class SolrService implements FullTextSearchService {
                                             IndexStatus.EXTRACTING_CONTENT,
                                             WatcherStatus.UNKNOWN))
                                     .toList();
-                            loc.setIndexedFiles(files);
+                            loc.setIndexedFiles(new ArrayList<>(files));
                             return files.stream();
                         })
                         .toList();
@@ -153,7 +153,7 @@ public class SolrService implements FullTextSearchService {
         }
     }
 
-    public void updateFile(IndexLocation indexLocation, File file) {
+    public void updateLocation(IndexLocation indexLocation, File file) {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -163,12 +163,13 @@ public class SolrService implements FullTextSearchService {
                     indexLocation.getIndexedFiles().add(location);
                     Document document = contentExtractor.getDocumentFromFile(file);
                     if (document != null) {
-                        indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                        location.setIndexStatus(IndexStatus.INDEXED);
                         client.addBean(document);
                         client.commit();
                     } else {
-                        indexLocation.setIndexStatus(IndexStatus.FAILED);
+                        location.setIndexStatus(IndexStatus.FAILED);
                     }
+                    indexLocation.setIndexStatus(IndexStatus.INDEXED);
                 } catch (Exception e) {
                     log.error("Error when updating {}", file, e);
                 }
@@ -196,7 +197,7 @@ public class SolrService implements FullTextSearchService {
                                             IndexStatus.EXTRACTING_CONTENT,
                                             WatcherStatus.UNKNOWN))
                                     .toList();
-                            location.setIndexedFiles(files);
+                            location.setIndexedFiles(new ArrayList<>(files));
                             return files.stream();
                         })
                         .toList();

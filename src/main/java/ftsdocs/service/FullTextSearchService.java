@@ -19,6 +19,6 @@ public interface FullTextSearchService {
     void indexLocations(Collection<IndexLocation> locations, boolean updateWatcher,
             EventHandler<WorkerStateEvent> successHandler);
 
-    void updateFile(IndexLocation indexLocation, File file);
+    void updateLocation(IndexLocation indexLocation, File file);
 
 }

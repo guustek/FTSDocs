@@ -103,7 +103,7 @@ public class DirectoryWatcherManager {
                         .get(sourcePath.toString());
                 if (indexLocation != null) {
                     File file = event.path().toFile();
-                    ftsService.updateFile(indexLocation, file);
+                    ftsService.updateLocation(indexLocation, file);
                 }
             }
             case DELETE -> {

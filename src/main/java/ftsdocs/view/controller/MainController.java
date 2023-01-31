@@ -48,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.control.MasterDetailPane;
+import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -179,6 +180,7 @@ public class MainController implements Initializable {
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(-1, width, width, width))));
         defineDocumentTable();
+        TextFields.bindAutoCompletion(this.searchTextField, param -> List.of("XD", "XDDDD"));
     }
 
     private void search() {
