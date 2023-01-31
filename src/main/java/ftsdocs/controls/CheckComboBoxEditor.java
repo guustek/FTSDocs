@@ -1,4 +1,4 @@
-package ftsdocs;
+package ftsdocs.controls;
 
 import java.util.ArrayList;
 import java.util.Collection;

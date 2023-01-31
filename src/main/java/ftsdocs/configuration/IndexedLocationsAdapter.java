@@ -2,8 +2,8 @@ package ftsdocs.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -24,11 +24,11 @@ public class IndexedLocationsAdapter extends TypeAdapter<Map<String, IndexLocati
 
     @Override
     public Map<String, IndexLocation> read(JsonReader in) throws IOException {
-        Map<String, IndexLocation> map = new LinkedHashMap<>();
+        Map<String, IndexLocation> map = new ConcurrentHashMap<>();
         in.beginArray();
         while (in.hasNext()) {
             String key = in.nextString();
-            map.put(key, new IndexLocation(new File(key)));
+            map.put(key, new IndexLocation(new File(key), true));
         }
         in.endArray();
         return map;

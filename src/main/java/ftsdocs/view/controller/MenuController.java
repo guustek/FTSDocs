@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.HyperlinkLabel;
-import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -110,6 +108,7 @@ public class MenuController implements Initializable {
         List<IndexLocation> indexLocations = files.stream()
                 .map(file -> new IndexLocation(
                         file,
+                        true,
                         IndexStatus.UNKNOWN,
                         WatcherStatus.DISABLED))
                 .toList();
@@ -132,15 +131,11 @@ public class MenuController implements Initializable {
                                     + "] for details");
                     indicesViewLink.setFocusTraversable(false);
                     indicesViewLink.setOnAction(linkEvent -> {
-                        Hyperlink source = ((Hyperlink) linkEvent.getSource());
+                        HyperlinkLabel source = ((HyperlinkLabel) linkEvent.getSource());
                         viewManager.changeScene(View.valueOf(source.getText().toUpperCase()));
                     });
 
-                    Notifications.create()
-                            .owner(root)
-                            .title("Information")
-                            .graphic(indicesViewLink)
-                            .show();
+                    this.viewManager.showNotification("Information", null, indicesViewLink);
                 });
     }
 }

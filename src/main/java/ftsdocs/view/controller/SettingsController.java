@@ -17,7 +17,7 @@ import org.controlsfx.control.PropertySheet;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.CheckComboBoxEditor;
+import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.configuration.Category;
 import ftsdocs.configuration.Configuration;
 import ftsdocs.model.DocumentType;

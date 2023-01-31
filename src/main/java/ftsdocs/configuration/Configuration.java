@@ -3,9 +3,9 @@ package ftsdocs.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
@@ -30,7 +30,7 @@ import ftsdocs.model.IndexLocation;
 @Setter
 public class Configuration {
 
-    public static final String serverClassName = "ftsdocs.server.SolrEmbeddedServer";
+    public static final String SERVER_CLASS = "ftsdocs.server.SolrEmbeddedServer";
 
     private static final Set<DocumentType> DEFAULT_DOCUMENT_TYPES = Set.of(
             new DocumentType("PDF file", true, "pdf"),
@@ -63,10 +63,10 @@ public class Configuration {
     //endregion Indexing
 
     @JsonAdapter(IndexedLocationsAdapter.class)
-    private LinkedHashMap<String, IndexLocation> indexedLocations;
+    private ConcurrentHashMap<String, IndexLocation> indexedLocations;
 
     public Configuration() {
-        this.indexedLocations = new LinkedHashMap<>();
+        this.indexedLocations = new ConcurrentHashMap<>();
         reset();
     }
 
@@ -94,7 +94,7 @@ public class Configuration {
         this.documentTypes = configuration.getDocumentTypes().stream()
                 .map(doc -> new DocumentType(doc.getName(), doc.isEnabled(), doc.getExtensions()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        this.indexedLocations = new LinkedHashMap<>(configuration.getIndexedLocations());
+        this.indexedLocations = new ConcurrentHashMap<>(configuration.getIndexedLocations());
     }
 
     public boolean isFileFormatSupported(File file) {

@@ -3,11 +3,13 @@ package ftsdocs.view;
 import java.io.IOException;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import jfxtras.styles.jmetro.Style;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.Notifications;
@@ -62,11 +64,16 @@ public class ViewManagerImpl implements ViewManager {
     }
 
     @Override
-    public void showNotification(String title, String text) {
-        Notifications.create()
+    public void showNotification(@NonNull String title, String text, Node graphic) {
+        Notifications notification = Notifications.create()
                 .owner(this.application.getStage())
-                .title(title)
-                .text(text)
-                .show();
+                .title(title);
+        if (text != null) {
+            notification.text(text);
+        }
+        if (graphic != null) {
+            notification.graphic(graphic);
+        }
+        notification.show();
     }
 }

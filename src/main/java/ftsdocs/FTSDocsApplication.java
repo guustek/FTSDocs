@@ -44,13 +44,6 @@ import ftsdocs.view.ViewManagerImpl;
 @ComponentScan
 public class FTSDocsApplication extends Application {
 
-    static {
-        System.setProperty("logFileName", "FTSDocs-.log");
-    }
-
-    public static final double MIN_HEIGHT = 700;
-    public static final double MIN_WIDTH = 900;
-
     public static final String APP_NAME = "FTSDocs";
     //public static final File HOME_DIR = new File(SystemUtils.getUserHome(), APP_NAME);
     public static final File HOME_DIR = new File(APP_NAME);
@@ -81,6 +74,8 @@ public class FTSDocsApplication extends Application {
         log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
         log.info("Working directory: {}", SystemUtils.getUserDir());
         log.info("Operating system: {}, {}", SystemUtils.OS_NAME, SystemUtils.OS_ARCH);
+        log.info("System language: {}", SystemUtils.USER_LANGUAGE);
+        log.info("File system: {}", FileSystemUtils.getFileSystem().getClass().getName());
 
         this.context = new AnnotationConfigApplicationContext(getClass());
 

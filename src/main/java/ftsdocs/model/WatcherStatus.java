@@ -2,16 +2,18 @@ package ftsdocs.model;
 
 import lombok.Getter;
 
+@Getter
 public enum WatcherStatus {
-    DISABLED("Disabled"),
-    BUILDING_WATCHER("Building watcher"),
-    WATCHING("Watching"),
-    UNKNOWN("");
+    DISABLED("Disabled", "Watcher is disabled"),
+    BUILDING_WATCHER("Building watcher", "Watcher is building and reading file tree"),
+    WATCHING("Watching", "Watcher is listening for changes in file system"),
+    UNKNOWN("", "");
 
-    @Getter
     private final String displayName;
+    private final String description;
 
-    WatcherStatus(String displayName) {
+    WatcherStatus(String displayName, String description) {
         this.displayName = displayName;
+        this.description = description;
     }
 }

@@ -13,6 +13,6 @@ public class ServerBeanCondition implements Condition {
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         Object source = metadata.getAnnotations().get(Conditional.class).getSource();
         String serverClassName = source.toString();
-        return Configuration.serverClassName.equals(serverClassName);
+        return Configuration.SERVER_CLASS.equals(serverClassName);
     }
 }

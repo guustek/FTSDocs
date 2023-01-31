@@ -14,19 +14,23 @@ public class IndexLocation {
 
 
     private final File root;
-    private transient Collection<File> indexedFiles;
+    private transient Collection<IndexLocation> indexedFiles;
     private transient IndexStatus indexStatus;
     private transient WatcherStatus watcherStatus;
+    private boolean isRoot;
 
-    public IndexLocation(File file) {
+    public IndexLocation(File file, boolean isRoot) {
         this.root = file;
+        this.isRoot = isRoot;
         this.indexedFiles = new LinkedList<>();
         this.indexStatus = IndexStatus.UNKNOWN;
         this.watcherStatus = WatcherStatus.UNKNOWN;
     }
 
-    public IndexLocation(File file, IndexStatus indexStatus, WatcherStatus watcherStatus) {
+    public IndexLocation(File file, boolean isRoot, IndexStatus indexStatus,
+            WatcherStatus watcherStatus) {
         this.root = file;
+        this.isRoot = isRoot;
         this.indexedFiles = new LinkedList<>();
         this.indexStatus = indexStatus;
         this.watcherStatus = watcherStatus;
@@ -49,5 +53,9 @@ public class IndexLocation {
     @Override
     public int hashCode() {
         return root.hashCode();
+    }
+
+    public boolean isRoot() {
+        return isRoot;
     }
 }

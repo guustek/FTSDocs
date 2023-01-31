@@ -1,8 +1,7 @@
 package ftsdocs.view.controller;
 
-import java.awt.Desktop;
-import java.awt.Desktop.Action;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -53,8 +52,10 @@ import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.configuration.Configuration;
 import ftsdocs.FTSDocsApplication;
+import ftsdocs.FileSystemUtils;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.controls.FileContextMenu;
 import ftsdocs.model.Document;
 import ftsdocs.model.HighlightSnippet;
 import ftsdocs.service.FullTextSearchService;
@@ -191,7 +192,7 @@ public class MainController implements Initializable {
 
         this.documentPreviewPane.setShowDetailNode(false);
         this.viewManager.showNotification("Information",
-                "Found " + result.size() + (result.size() == 1 ? " document" : " documents"));
+                "Found " + result.size() + (result.size() == 1 ? " document" : " documents"), null);
     }
 
     private void handleDocumentClick(MouseEvent event) {
@@ -207,7 +208,12 @@ public class MainController implements Initializable {
         if (event.getClickCount() == 1) {
             fillContentArea(selectedDocument);
         } else {
-            openDocument(Path.of(selectedDocument.getPath()));
+            try {
+                FileSystemUtils.openDocument(Path.of(selectedDocument.getPath()));
+            } catch (IOException e) {
+                log.error("Failed opening: {}", selectedDocument.getPath(), e);
+                this.viewManager.showNotification("Error", e.getMessage(), null);
+            }
 
         }
     }
@@ -223,19 +229,6 @@ public class MainController implements Initializable {
         }
         split.add(content.substring(lastEnd));
         return split;
-    }
-
-    private void openDocument(Path path) {
-        final Desktop desktop = Desktop.getDesktop();
-        if (desktop.isSupported(Action.OPEN)) {
-            try {
-                File file = path.toFile();
-                desktop.open(file);
-            } catch (Exception e) {
-                log.error("Failed opening file: {}", path, e);
-                this.viewManager.showNotification("Error", e.getMessage());
-            }
-        }
     }
 
     private void scrollToAndSelect(int start, int length) {
@@ -359,7 +352,17 @@ public class MainController implements Initializable {
         this.documentTable.setItems(documents);
         this.documentTable.setEditable(false);
         this.documentTable.setRowFactory(param -> {
-            TableRow<Document> row = new TableRow<>();
+            TableRow<Document> row = new TableRow<>() {
+                @Override
+                protected void updateItem(Document item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setContextMenu(null);
+                    } else {
+                        setContextMenu(new FileContextMenu(new File(item.getPath())));
+                    }
+                }
+            };
             row.setOnMouseClicked(this::handleDocumentClick);
             return row;
         });

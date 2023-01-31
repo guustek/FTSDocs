@@ -112,7 +112,8 @@ public class DirectoryWatcherManager {
                 if (indexLocation != null) {
                     indexLocation.setIndexStatus(IndexStatus.UPDATING);
                     Path path = event.path();
-                    indexLocation.getIndexedFiles().remove(path.toFile());
+                    this.configuration.getIndexedLocations().values()
+                            .forEach(loc -> loc.getIndexedFiles().removeIf(file -> file.getRoot().equals(path.toFile())));
                     this.ftsService.deleteFromIndex(Collections.singletonList(path));
                     indexLocation.setIndexStatus(IndexStatus.INDEXED);
                 }

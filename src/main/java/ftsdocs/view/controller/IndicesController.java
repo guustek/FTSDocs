@@ -4,12 +4,17 @@ import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +23,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import ftsdocs.configuration.Configuration;
+import ftsdocs.controls.FileContextMenu;
 import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.WatcherStatus;
+import ftsdocs.view.ViewManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,22 +45,77 @@ public class IndicesController implements Initializable {
     private TreeTableColumn<IndexLocation, String> watcherStatusColumn;
 
     private final Configuration configuration;
+    private final ViewManager viewManager;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         defineLocationsTable();
     }
 
+    @SuppressWarnings("java:S110")
     private void defineLocationsTable() {
         this.indicesTable.setRoot(new TreeItem<>());
         this.indicesTable.setEditable(false);
+        this.indicesTable.setRowFactory(param -> new TreeTableRow<>() {
+            @Override
+            protected void updateItem(IndexLocation item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setContextMenu(null);
+                } else {
+                    styleProperty().bind(
+                            Bindings.when(new SimpleBooleanProperty(item.isRoot()))
+                                    .then("-fx-font-weight: bold;")
+                                    .otherwise(""));
+                    setContextMenu(new FileContextMenu(item.getRoot()));
+                }
+            }
+        });
+
         this.locationColumn.prefWidthProperty().bind(getLocationColumnSize());
-        this.locationColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getValue().getRoot().getPath()));
-        this.indexStatusColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(
-                c.getValue().getValue().getIndexStatus().getDisplayName()));
-        this.watcherStatusColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(
-                c.getValue().getValue().getWatcherStatus().getDisplayName()));
+        this.locationColumn.setCellValueFactory(
+                c -> new ReadOnlyStringWrapper(c.getValue().getValue().getRoot().getPath()));
+
+        this.indexStatusColumn.setCellFactory(param -> new TreeTableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (!empty) {
+                    setText(item);
+                    String tooltipText = IndexStatus.valueOf(
+                            item.replace(" ", "_").toUpperCase()).getDescription();
+                    setTooltip(new Tooltip(tooltipText));
+                } else {
+                    setText(null);
+                    setTooltip(null);
+                }
+            }
+        });
+        this.indexStatusColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        c.getValue().getValue().getIndexStatus().getDisplayName()));
+
+        this.watcherStatusColumn.setCellFactory(param -> new TreeTableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (!empty) {
+                    setText(item);
+                    String tooltipText = WatcherStatus.valueOf(
+                            item.replace(" ", "_").toUpperCase()).getDescription();
+                    setTooltip(new Tooltip(tooltipText));
+                } else {
+                    setText(null);
+                    setTooltip(null);
+                }
+            }
+        });
+        this.watcherStatusColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        c.getValue().getValue().getWatcherStatus().getDisplayName()));
+
         populateTable();
+
     }
 
     private void populateTable() {
@@ -63,7 +127,7 @@ public class IndicesController implements Initializable {
 
             if (loc.getRoot().isDirectory() && !loc.getIndexedFiles().isEmpty()) {
                 loc.getIndexedFiles().forEach(file -> {
-                    TreeItem<IndexLocation> fileItem = new TreeItem<>(new IndexLocation(file));
+                    TreeItem<IndexLocation> fileItem = new TreeItem<>(file);
                     locationItem.getChildren().add(fileItem);
                 });
             }
