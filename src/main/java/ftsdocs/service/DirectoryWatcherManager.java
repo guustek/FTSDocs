@@ -104,6 +104,12 @@ public class DirectoryWatcherManager {
                 if (indexLocation != null) {
                     File file = event.path().toFile();
                     ftsService.updateLocation(indexLocation, file);
+                    if (indexLocation.getIndexedFiles().stream()
+                            .allMatch(loc -> loc.getIndexStatus() == IndexStatus.FAILED)) {
+                        indexLocation.setIndexStatus(IndexStatus.FAILED);
+                    } else {
+                        indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                    }
                 }
             }
             case DELETE -> {
@@ -115,7 +121,12 @@ public class DirectoryWatcherManager {
                     this.configuration.getIndexedLocations().values()
                             .forEach(loc -> loc.getIndexedFiles().removeIf(file -> file.getRoot().equals(path.toFile())));
                     this.ftsService.deleteFromIndex(Collections.singletonList(path));
-                    indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                    if (indexLocation.getIndexedFiles().stream()
+                            .allMatch(loc -> loc.getIndexStatus() == IndexStatus.FAILED)) {
+                        indexLocation.setIndexStatus(IndexStatus.FAILED);
+                    } else {
+                        indexLocation.setIndexStatus(IndexStatus.INDEXED);
+                    }
                 }
 
             }

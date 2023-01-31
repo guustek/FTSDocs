@@ -159,7 +159,7 @@ public class SolrService implements FullTextSearchService {
             protected Void call() {
                 try {
                     indexLocation.setIndexStatus(IndexStatus.UPDATING);
-                    IndexLocation location = new IndexLocation(file,false);
+                    IndexLocation location = new IndexLocation(file, false);
                     indexLocation.getIndexedFiles().add(location);
                     Document document = contentExtractor.getDocumentFromFile(file);
                     if (document != null) {
@@ -169,7 +169,6 @@ public class SolrService implements FullTextSearchService {
                     } else {
                         location.setIndexStatus(IndexStatus.FAILED);
                     }
-                    indexLocation.setIndexStatus(IndexStatus.INDEXED);
                 } catch (Exception e) {
                     log.error("Error when updating {}", file, e);
                 }
@@ -211,7 +210,7 @@ public class SolrService implements FullTextSearchService {
 
     private void deleteFilesNotInCollection(Collection<IndexLocation> actualFiles) {
         List<Path> toBeDeleted = searchDocuments("*").stream()
-                .map(doc -> new IndexLocation(new File(doc.getPath()),false))
+                .map(doc -> new IndexLocation(new File(doc.getPath()), false))
                 .filter(path -> !actualFiles.contains(path))
                 .map(loc -> loc.getRoot().toPath())
                 .toList();
@@ -260,7 +259,13 @@ public class SolrService implements FullTextSearchService {
             client.commit();
 
             indexLocations.forEach(loc -> {
-                loc.setIndexStatus(IndexStatus.INDEXED);
+                if (loc.getIndexedFiles().stream()
+                        .allMatch(file -> file.getIndexStatus() == IndexStatus.FAILED)) {
+                    loc.setIndexStatus(IndexStatus.FAILED);
+                } else {
+                    loc.setIndexStatus(IndexStatus.INDEXED);
+                }
+
                 loc.getIndexedFiles().forEach(file -> {
                     if (file.getIndexStatus() != IndexStatus.FAILED) {
                         file.setIndexStatus(IndexStatus.INDEXED);
