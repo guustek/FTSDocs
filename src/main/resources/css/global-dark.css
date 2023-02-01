@@ -12,9 +12,18 @@
   -fx-padding: 10px;
 }
 
-.auto-complete-popup {
+/* region textfield */
 
+.text-field:focused {
+  -fx-background-color: -fx-shadow-highlight-color, -fx-text-box-border, black;
+  -fx-text-fill: white;
 }
+
+.text-field > .right-button {
+  -fx-background-color: black;
+}
+
+/*endregion textfield*/
 
 /* region notification */
 

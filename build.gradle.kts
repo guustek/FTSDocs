@@ -47,7 +47,7 @@ dependencies {
 
 javafx {
     version = "17"
-    modules("javafx.controls", "javafx.fxml", "javafx.web")
+    modules("javafx.controls", "javafx.fxml")
 //    configuration = "compileOnly"
 }
 

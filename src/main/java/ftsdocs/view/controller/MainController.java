@@ -2,6 +2,7 @@ package ftsdocs.view.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -27,6 +29,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -44,10 +47,13 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.controlsfx.control.MasterDetailPane;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
@@ -171,16 +177,45 @@ public class MainController implements Initializable {
     // endregion
 
     @Override
+    @SuppressWarnings({"unchecked", "java:S3011"})
     public void initialize(URL location, ResourceBundle resources) {
-        Color color = configuration.isEnableDarkMode()
+        Color color = this.configuration.isEnableDarkMode()
                 ? Color.rgb(23, 23, 23)
                 : Color.rgb(233, 233, 233);
         double width = 1.5;
-        documentContentTextArea.setBorder(
+        this.documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
                         CornerRadii.EMPTY, new BorderWidths(-1, width, width, width))));
         defineDocumentTable();
-        TextFields.bindAutoCompletion(this.searchTextField, param -> List.of("XD", "XDDDD"));
+
+        AutoCompletionBinding<String> completionBinding = TextFields.bindAutoCompletion(
+                this.searchTextField, param -> List.of());
+
+        AutoCompletePopup<String> autoCompletionPopup = completionBinding.getAutoCompletionPopup();
+        AutoCompletePopupSkin<String> skin = new AutoCompletePopupSkin<>(autoCompletionPopup);
+        autoCompletionPopup.prefWidthProperty().bind(this.searchTextField.widthProperty());
+
+        try {
+            Field suggestionListField = skin.getClass().getDeclaredField("suggestionList");
+            suggestionListField.setAccessible(true);
+            ListView<String> suggestionList = (ListView<String>) suggestionListField.get(skin);
+            suggestionList.prefHeightProperty().bind(
+                    Bindings.min(autoCompletionPopup.visibleRowCountProperty(),
+                                    Bindings.size(suggestionList.getItems()))
+                            .multiply(24));
+            suggestionListField.setAccessible(false);
+            autoCompletionPopup.setSkin(skin);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            log.error("Failed overriding suggestionList height binding", e);
+        }
+
+        if (this.configuration.isEnableDarkMode()) {
+            autoCompletionPopup.setStyle("""
+                    -fx-control-inner-background:#333;
+                    -fx-selection-bar-non-focused:#515151;
+                    """);
+        }
+
     }
 
     private void search() {
