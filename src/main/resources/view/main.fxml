@@ -9,101 +9,81 @@
 <?import org.fxmisc.flowless.*?>
 <?import org.fxmisc.richtext.*?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0"
-  minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background"
-  xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="ftsdocs.view.controller.MainController">
+<BorderPane fx:id="root" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="700.0" minWidth="900.0" prefHeight="700.0" prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.view.controller.MainController">
   <left>
-    <fx:include source="menu.fxml"/>
+    <fx:include source="menu.fxml" />
   </left>
   <center>
-    <VBox prefHeight="200.0" prefWidth="100.0" styleClass="background"
-      BorderPane.alignment="CENTER">
+    <VBox prefHeight="200.0" prefWidth="100.0" styleClass="background" BorderPane.alignment="CENTER">
       <Label style="-fx-font-weight: bold;" text="Home">
         <font>
-          <Font size="20.0"/>
+          <Font size="20.0" />
         </font>
         <VBox.margin>
-          <Insets bottom="22.0" top="9.0"/>
+          <Insets bottom="22.0" top="9.0" />
         </VBox.margin>
       </Label>
       <HBox alignment="CENTER" spacing="5.0">
         <VBox.margin>
-          <Insets left="10.0" right="10.0" bottom="10.0" top="10.0"/>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>
-        <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false"
-          mnemonicParsing="false" onMouseClicked="#searchButtonClicked">
+        <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onMouseClicked="#searchButtonClicked">
           <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-              <Image url="@../icon/search_icon.png"/>
+              <Image url="@../icon/search_icon.png" />
             </ImageView>
           </graphic>
           <HBox.margin>
-            <Insets/>
+            <Insets />
           </HBox.margin>
         </Button>
-        <TextField fx:id="searchTextField" HBox.hgrow="ALWAYS" onKeyPressed="#searchKeyClick">
+        <TextField fx:id="searchTextField" onKeyPressed="#searchKeyClick" HBox.hgrow="ALWAYS">
           <HBox.margin>
-            <Insets/>
+            <Insets />
           </HBox.margin>
         </TextField>
       </HBox>
-      <MasterDetailPane fx:id="documentPreviewPane" detailSide="BOTTOM" dividerPosition="0.4"
-        showDetailNode="false" VBox.vgrow="ALWAYS">
+      <MasterDetailPane fx:id="documentPreviewPane" detailSide="BOTTOM" dividerPosition="0.4" showDetailNode="false" VBox.vgrow="ALWAYS">
         <VBox.margin>
-          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>
         <masterNode>
           <TableView fx:id="documentTable" VBox.vgrow="ALWAYS">
             <columns>
-              <TableColumn fx:id="indexColumn" text="#" editable="false" maxWidth="65.0"
-                minWidth="65.0" prefWidth="65.0" resizable="false"/>
-              <TableColumn fx:id="documentPathColumn" editable="false"
-                maxWidth="1.7976931348623157E308" minWidth="132.0" prefWidth="132.0"
-                resizable="false" text="Path"/>
-              <TableColumn fx:id="documentSizeColumn" editable="false" maxWidth="100.0"
-                minWidth="100.0" prefWidth="100.0" resizable="false" text="Size"/>
-              <TableColumn fx:id="documentCreationTimeColumn" editable="false" maxWidth="160.0"
-                minWidth="160.0" prefWidth="160.0" resizable="false" text="Created"/>
-              <TableColumn fx:id="documentModificationTimeColumn" editable="false" maxWidth="160.0"
-                minWidth="160.0" prefWidth="160.0" resizable="false" text="Modified"/>
+              <TableColumn fx:id="indexColumn" editable="false" maxWidth="65.0" minWidth="65.0" prefWidth="65.0" resizable="false" text="#" />
+              <TableColumn fx:id="documentPathColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="132.0" prefWidth="132.0" resizable="false" text="Path" />
+              <TableColumn fx:id="documentSizeColumn" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Size" />
+              <TableColumn fx:id="documentCreationTimeColumn" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="Created" />
+              <TableColumn fx:id="documentModificationTimeColumn" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="Modified" />
             </columns>
           </TableView>
         </masterNode>
         <detailNode>
           <VBox>
             <HBox spacing="20.0" styleClass="matches-box">
-              <Label fx:id="matchesCountLabel" alignment="CENTER" contentDisplay="CENTER"
-                maxHeight="Infinity" maxWidth="100" minWidth="100" prefWidth="100"
-                textAlignment="CENTER"/>
-              <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER"
-                focusTraversable="false" mnemonicParsing="false"
-                onMouseClicked="#previousHighlightClick">
+              <Label fx:id="matchesCountLabel" alignment="CENTER" contentDisplay="CENTER" maxHeight="Infinity" maxWidth="100" minWidth="100" prefWidth="100" textAlignment="CENTER" />
+              <Button fx:id="previousButton" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#previousHighlightClick">
                 <tooltip>
-                  <Tooltip text="Previous highlight"/>
+                  <Tooltip text="Previous highlight" />
                 </tooltip>
               </Button>
-              <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER"
-                focusTraversable="false" mnemonicParsing="false"
-                onMouseClicked="#nextHighlightClick">
+              <Button fx:id="nextButton" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#nextHighlightClick">
                 <tooltip>
-                  <Tooltip text="Next highlight"/>
+                  <Tooltip text="Next highlight" />
                 </tooltip>
               </Button>
-              <Region HBox.hgrow="ALWAYS"/>
-              <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false"
-                mnemonicParsing="false" onMouseClicked="#closePreviewClick">
+              <Region HBox.hgrow="ALWAYS" />
+              <Button alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" onMouseClicked="#closePreviewClick">
                 <tooltip>
-                  <Tooltip text="Close preview"/>
+                  <Tooltip text="Close preview" />
                 </tooltip>
               </Button>
             </HBox>
             <VirtualizedScrollPane hbarPolicy="NEVER" styleClass="background" VBox.vgrow="ALWAYS">
               <content>
-                <InlineCssTextArea fx:id="documentContentTextArea" editable="false" showCaret="off"
-                  styleClass="background" wrapText="true" VBox.vgrow="ALWAYS">
+                <InlineCssTextArea fx:id="documentContentTextArea" editable="false" showCaret="off" styleClass="background" wrapText="true" VBox.vgrow="ALWAYS">
                   <padding>
-                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                   </padding>
                 </InlineCssTextArea>
               </content>
@@ -112,10 +92,10 @@
         </detailNode>
       </MasterDetailPane>
       <BorderPane.margin>
-        <Insets bottom="10.0" top="10.0"/>
+        <Insets bottom="10.0" top="10.0" />
       </BorderPane.margin>
       <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" />
       </padding>
     </VBox>
   </center>

@@ -1,15 +1,20 @@
 package ftsdocs.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -19,7 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SuggesterResponse;
+import org.apache.solr.client.solrj.response.Suggestion;
 import org.apache.solr.common.params.CommonParams;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
@@ -46,6 +54,10 @@ public class SolrService implements FullTextSearchService {
     private final Configuration configuration;
     private final DirectoryWatcherManager watcherManager;
 
+    private static final String HIGHLIGHT_PREFIX = "<b>";
+    private static final String HIGHLIGHT_POSTFIX = "</b>";
+    private static final Pattern SUGGESTION_HIGHLIGHT_PATTERN = Pattern.compile(HIGHLIGHT_PREFIX + "(.*?)" + HIGHLIGHT_POSTFIX);
+
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public SolrService(
             ContentExtractor contentExtractor,
@@ -67,7 +79,7 @@ public class SolrService implements FullTextSearchService {
 
     public Collection<Document> searchDocuments(String query) {
         Collection<Document> documents = Collections.emptyList();
-        SolrQuery solrQuery = prepareQuery(query);
+        SolrQuery solrQuery = prepareSearchQuery(query);
         try {
             QueryResponse response = this.client.query(solrQuery);
             documents = response.getBeans(Document.class);
@@ -85,6 +97,54 @@ public class SolrService implements FullTextSearchService {
                     FTSDocsApplication.GSON.toJson(solrQuery.toString()), e);
         }
         return documents;
+    }
+
+    @Override
+    public Collection<String> getSuggestions(String searchPhrase) {
+        SolrQuery query = new SolrQuery()
+                .setRequestHandler("/suggest")
+                .setParam("suggest", "true")
+                .setParam("suggest.q", searchPhrase);
+        Set<String> result = new HashSet<>();
+        try {
+            QueryResponse response = this.client.query(query);
+            SuggesterResponse suggesterResponse = response.getSuggesterResponse();
+            List<Suggestion> suggestions = suggesterResponse.getSuggestions().get("mySuggester");
+            suggestions.forEach(
+                    suggestion -> result.addAll(extractTermsFromHighlights(suggestion.getTerm())));
+            log.info("");
+        } catch (SolrServerException | IOException e) {
+            log.error("Error while fetching suggestions for phrase: {}", searchPhrase, e);
+        }
+        return result;
+    }
+
+    private List<String> extractTermsFromHighlights(String term) {
+        List<String> highlightedWords = new ArrayList<>();
+        Matcher matcher = SUGGESTION_HIGHLIGHT_PATTERN.matcher(term);
+
+        while (matcher.find()) {
+            String highlighted = matcher.group(1);
+            int start = matcher.end();
+            Set<Character> wordEndCharacters = Set.of(
+                    ' ',
+                    '\n',
+                    '.',
+                    ','
+            );
+            int end = start;
+            for (; end < term.length(); end++) {
+                if (wordEndCharacters.contains(term.charAt(end))) {
+                    break;
+                }
+            }
+            String substring = term.substring(start, end);
+            String word = highlighted + substring;
+            word = word.replace(HIGHLIGHT_PREFIX,"");
+            word = word.replace(HIGHLIGHT_POSTFIX,"");
+            highlightedWords.add(word.toLowerCase());
+        }
+        return highlightedWords;
     }
 
     public void deleteFromIndex(Collection<Path> paths) {
@@ -284,7 +344,7 @@ public class SolrService implements FullTextSearchService {
         return documents;
     }
 
-    private SolrQuery prepareQuery(String query) {
+    private SolrQuery prepareSearchQuery(String query) {
         return new SolrQuery()
                 .setParam(CommonParams.DF, FieldName.CONTENT)
                 //.setParam(CommonParams.FL, "*", "score")

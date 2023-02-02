@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -189,7 +190,13 @@ public class MainController implements Initializable {
         defineDocumentTable();
 
         AutoCompletionBinding<String> completionBinding = TextFields.bindAutoCompletion(
-                this.searchTextField, param -> List.of());
+                this.searchTextField, param -> {
+                    String userText = param.getUserText();
+                    if(!userText.isBlank()){
+                        return ftsService.getSuggestions(userText);
+                    }
+                    return Collections.emptyList();
+                });
 
         AutoCompletePopup<String> autoCompletionPopup = completionBinding.getAutoCompletionPopup();
         AutoCompletePopupSkin<String> skin = new AutoCompletePopupSkin<>(autoCompletionPopup);
@@ -215,7 +222,6 @@ public class MainController implements Initializable {
                     -fx-selection-bar-non-focused:#515151;
                     """);
         }
-
     }
 
     private void search() {
@@ -225,6 +231,7 @@ public class MainController implements Initializable {
         }
         Collection<Document> result = this.ftsService.searchDocuments(query);
         this.documents.setAll(result);
+        this.documentTable.refresh();
         clearContentArea();
 
         this.documentPreviewPane.setShowDetailNode(false);

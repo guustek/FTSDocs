@@ -951,6 +951,29 @@
     </highlighting>
   </searchComponent>
 
+  <searchComponent name="suggest" class="solr.SuggestComponent">
+    <lst name="suggester">
+      <str name="name">mySuggester</str>
+      <str name="lookupImpl">BlendedInfixLookupFactory</str>
+      <str name="dictionaryImpl">DocumentDictionaryFactory</str>
+      <str name="field">content</str>
+      <str name="suggestAnalyzerFieldType">text_general</str>
+
+    </lst>
+  </searchComponent>
+
+  <requestHandler name="/suggest" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="suggest">true</str>
+      <str name="suggest.count">10</str>
+      <str name="suggest.dictionary">mySuggester</str>
+      <str name="suggest.build">true</str>
+    </lst>
+    <arr name="components">
+      <str>suggest</str>
+    </arr>
+  </requestHandler>
+
   <!-- Update Request Processors
        https://solr.apache.org/guide/update-request-processors.html
 

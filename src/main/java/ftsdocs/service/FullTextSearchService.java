@@ -14,6 +14,8 @@ public interface FullTextSearchService {
 
     Collection<Document> searchDocuments(String query);
 
+    Collection<String> getSuggestions(String searchPhrase);
+
     void deleteFromIndex(Collection<Path> path);
 
     void indexLocations(Collection<IndexLocation> locations, boolean updateWatcher,
