@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -26,8 +27,7 @@ import org.springframework.stereotype.Component;
 import ftsdocs.configuration.Configuration;
 import ftsdocs.model.Document;
 import ftsdocs.model.IndexLocation;
-import ftsdocs.model.IndexStatus;
-import ftsdocs.model.WatcherStatus;
+import ftsdocs.model.NotificationTitle;
 import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
@@ -108,9 +108,8 @@ public class MenuController implements Initializable {
         List<IndexLocation> indexLocations = files.stream()
                 .map(file -> new IndexLocation(
                         file,
-                        true,
-                        IndexStatus.UNKNOWN,
-                        WatcherStatus.DISABLED))
+                        true
+                ))
                 .toList();
 
         this.configuration.getIndexedLocations().putAll(indexLocations.stream()
@@ -131,11 +130,11 @@ public class MenuController implements Initializable {
                                     + "] for details");
                     indicesViewLink.setFocusTraversable(false);
                     indicesViewLink.setOnAction(linkEvent -> {
-                        HyperlinkLabel source = ((HyperlinkLabel) linkEvent.getSource());
+                        Hyperlink source = ((Hyperlink) linkEvent.getSource());
                         viewManager.changeScene(View.valueOf(source.getText().toUpperCase()));
                     });
 
-                    this.viewManager.showNotification("Information", null, indicesViewLink);
+                    this.viewManager.showNotification(NotificationTitle.INFORMATION, null, indicesViewLink);
                 });
     }
 }

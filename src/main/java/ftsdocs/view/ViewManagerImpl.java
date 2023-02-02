@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import jfxtras.styles.jmetro.Style;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.Notifications;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import ftsdocs.configuration.Configuration;
 import ftsdocs.FTSDocsApplication;
+import ftsdocs.model.NotificationTitle;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -66,10 +66,10 @@ public class ViewManagerImpl implements ViewManager {
     }
 
     @Override
-    public void showNotification(@NonNull String title, String text, Node graphic) {
+    public void showNotification(NotificationTitle title, String text, Node graphic) {
         Notifications notification = Notifications.create()
                 .owner(this.application.getStage())
-                .title(title);
+                .title(title.getTitle());
         if (text != null) {
             notification.text(text);
         }

@@ -7,6 +7,8 @@ import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
+import ftsdocs.FTSDocsApplication;
+
 @Slf4j
 public abstract class SolrServer implements FullTextSearchServer {
 
@@ -15,7 +17,7 @@ public abstract class SolrServer implements FullTextSearchServer {
 
     SolrServer() {
         try {
-            File engineFile = new File(SOLR_DIR);
+            File engineFile = new File(FTSDocsApplication.HOME_DIR, SOLR_DIR);
             if (!engineFile.exists()) {
                 File solrResourceDir = new File(this.getClass().getResource("/solr").toURI());
                 FileUtils.copyDirectory(solrResourceDir, engineFile);

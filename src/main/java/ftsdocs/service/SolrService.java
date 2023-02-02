@@ -72,7 +72,12 @@ public class SolrService implements FullTextSearchService {
 
         updateIndices();
         if (this.configuration.isEnableFileWatcher()) {
+            this.watcherManager = new DirectoryWatcherManager(this, this.configuration);
             this.watcherManager.updateWatchers(this.configuration.getIndexedLocations().values());
+        } else {
+            this.configuration.getIndexedLocations().values()
+                    .forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
+            this.configuration.writeToFile();
         }
 
     }
@@ -246,6 +251,7 @@ public class SolrService implements FullTextSearchService {
                         .toList();
                 deleteFilesNotInCollection(actualFiles);
                 doIndexing(configuration.getIndexedLocations().values(), actualFiles);
+                configuration.writeToFile();
                 return null;
             }
         };

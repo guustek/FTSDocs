@@ -127,6 +127,7 @@ public class DirectoryWatcherManager {
                     } else {
                         indexLocation.setIndexStatus(IndexStatus.INDEXED);
                     }
+                    this.configuration.writeToFile();
                 }
 
             }

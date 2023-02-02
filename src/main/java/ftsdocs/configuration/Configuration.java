@@ -35,6 +35,7 @@ public class Configuration extends EditableConfiguration {
         this.copyFrom(configuration);
     }
 
+    @Override
     public void reset() {
         super.reset();
         this.width = 900;

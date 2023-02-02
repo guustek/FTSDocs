@@ -66,6 +66,7 @@ import ftsdocs.configuration.Configuration;
 import ftsdocs.controls.FileContextMenu;
 import ftsdocs.model.Document;
 import ftsdocs.model.HighlightSnippet;
+import ftsdocs.model.NotificationTitle;
 import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.ViewManager;
 
@@ -204,7 +205,7 @@ public class MainController implements Initializable {
         clearContentArea();
 
         this.documentPreviewPane.setShowDetailNode(false);
-        this.viewManager.showNotification("Information",
+        this.viewManager.showNotification(NotificationTitle.INFORMATION,
                 "Found " + result.size() + (result.size() == 1 ? " document" : " documents"), null);
     }
 
@@ -225,7 +226,7 @@ public class MainController implements Initializable {
                 FileSystemUtils.openDocument(Path.of(selectedDocument.getPath()));
             } catch (IOException e) {
                 log.error("Failed opening: {}", selectedDocument.getPath(), e);
-                this.viewManager.showNotification("Error", e.getMessage(), null);
+                this.viewManager.showNotification(NotificationTitle.ERROR, e.getMessage(), null);
             }
 
         }
@@ -269,7 +270,7 @@ public class MainController implements Initializable {
         if (content == null) {
             this.previousButton.setDisable(true);
             this.nextButton.setDisable(true);
-            this.matchesCountLabel.setText("0 matches");
+            this.matchesCountLabel.setText("");
 
             Collection<String> finalStyles = new ArrayList<>(
                     styleStrings.get(DOCUMENT_CONTENT_STYLE_CLASS));
