@@ -39,6 +39,10 @@ public class Configuration {
 
     //region Appearance
 
+    private double width;
+
+    private double height;
+
     private boolean enableDarkMode;
 
     private Color highlightColor;
@@ -48,6 +52,8 @@ public class Configuration {
     //endregion Appearance
 
     //region Searching
+
+    private boolean enableSuggestions;
 
     private int maxSearchResults;
 
@@ -75,21 +81,31 @@ public class Configuration {
     }
 
     public void reset() {
+        this.width = 900;
+        this.height = 700;
         this.enableDarkMode = false;
         this.highlightColor = Color.rgb(0, 120, 215);
         this.contentFontSize = 14;
+
+        this.enableSuggestions = true;
         this.maxSearchResults = 100;
         this.maxPhraseHighlights = 100;
+
         this.enableFileWatcher = true;
         this.documentTypes = new LinkedHashSet<>(DEFAULT_DOCUMENT_TYPES);
     }
 
     public void copyFrom(Configuration configuration) {
+        this.width = configuration.getWidth();
+        this.height = configuration.getHeight();
         this.enableDarkMode = configuration.isEnableDarkMode();
         this.highlightColor = configuration.getHighlightColor();
         this.contentFontSize = configuration.getContentFontSize();
+
+        this.enableSuggestions = configuration.isEnableSuggestions();
         this.maxSearchResults = configuration.getMaxSearchResults();
         this.maxPhraseHighlights = configuration.getMaxPhraseHighlights();
+
         this.enableFileWatcher = configuration.isEnableFileWatcher();
         this.documentTypes = configuration.getDocumentTypes().stream()
                 .map(doc -> new DocumentType(doc.getName(), doc.isEnabled(), doc.getExtensions()))

@@ -62,6 +62,7 @@ public class FTSDocsApplication extends Application {
     private ViewManager viewManager;
 
     private FullTextSearchServer server;
+    private Configuration configuration;
 
     public static void main(String[] args) {
         launch(args);
@@ -80,7 +81,7 @@ public class FTSDocsApplication extends Application {
         this.context = new AnnotationConfigApplicationContext(getClass());
 
         this.context.getBeanFactory().registerSingleton("configuration", loadConfiguration());
-        Configuration configuration = this.context.getBean(Configuration.class);
+        this.configuration = this.context.getBean(Configuration.class);
 
         this.viewManager = new ViewManagerImpl(this, configuration);
         this.context.getBeanFactory().registerSingleton("viewManager", viewManager);
@@ -106,11 +107,13 @@ public class FTSDocsApplication extends Application {
 
     @Override
     public void stop() throws Exception {
+        this.configuration.writeToFile();
         if (this.server != null) {
             this.server.stop();
         }
         this.stage.hide();
         this.context.close();
+        this.configuration.writeToFile();
         Platform.exit();
         System.exit(0);
     }
@@ -131,12 +134,18 @@ public class FTSDocsApplication extends Application {
             this.stage = new Stage();
             this.stage.initStyle(StageStyle.DECORATED);
             this.viewManager.changeScene(View.MAIN);
-            this.stage.sizeToScene();
-            this.stage.setMinWidth(this.stage.getWidth());
-            this.stage.setMinHeight(this.stage.getHeight());
             this.stage.centerOnScreen();
             long time = System.currentTimeMillis() - start;
             log.info("Server started in {} seconds", (double) time / 1000);
+
+            this.stage.widthProperty().addListener((observable, oldValue, newValue) -> {
+                this.configuration.setWidth((Double) newValue);
+                this.configuration.writeToFile();
+            });
+            this.stage.heightProperty().addListener((observable, oldValue, newValue) -> {
+                this.configuration.setHeight((Double) newValue);
+                this.configuration.writeToFile();
+            });
         });
         Thread thread = new Thread(task, "Server startup thread");
         thread.start();

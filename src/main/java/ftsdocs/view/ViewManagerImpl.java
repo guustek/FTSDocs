@@ -48,11 +48,13 @@ public class ViewManagerImpl implements ViewManager {
             Stage stage = this.application.getStage();
             stage.setScene(scene);
 
-            double height = stage.getHeight();
-            double width = stage.getWidth();
+            if (view != View.SPLASH) {
+                double height = this.configuration.getHeight();
+                double width = this.configuration.getWidth();
 
-            stage.setHeight(height);
-            stage.setWidth(width);
+                stage.setHeight(height);
+                stage.setWidth(width);
+            }
 
             stage.show();
 
