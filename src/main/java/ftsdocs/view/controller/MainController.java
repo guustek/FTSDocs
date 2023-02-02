@@ -178,49 +178,18 @@ public class MainController implements Initializable {
     // endregion
 
     @Override
-    @SuppressWarnings({"unchecked", "java:S3011"})
     public void initialize(URL location, ResourceBundle resources) {
         Color color = this.configuration.isEnableDarkMode()
                 ? Color.rgb(23, 23, 23)
                 : Color.rgb(233, 233, 233);
-        double width = 1.5;
+        double border = 1.5;
         this.documentContentTextArea.setBorder(
                 new Border(new BorderStroke(color, BorderStrokeStyle.SOLID,
-                        CornerRadii.EMPTY, new BorderWidths(-1, width, width, width))));
+                        CornerRadii.EMPTY, new BorderWidths(-1, border, border, border))));
         defineDocumentTable();
 
-        AutoCompletionBinding<String> completionBinding = TextFields.bindAutoCompletion(
-                this.searchTextField, param -> {
-                    String userText = param.getUserText();
-                    if(!userText.isBlank()){
-                        return ftsService.getSuggestions(userText);
-                    }
-                    return Collections.emptyList();
-                });
-
-        AutoCompletePopup<String> autoCompletionPopup = completionBinding.getAutoCompletionPopup();
-        AutoCompletePopupSkin<String> skin = new AutoCompletePopupSkin<>(autoCompletionPopup);
-        autoCompletionPopup.prefWidthProperty().bind(this.searchTextField.widthProperty());
-
-        try {
-            Field suggestionListField = skin.getClass().getDeclaredField("suggestionList");
-            suggestionListField.setAccessible(true);
-            ListView<String> suggestionList = (ListView<String>) suggestionListField.get(skin);
-            suggestionList.prefHeightProperty().bind(
-                    Bindings.min(autoCompletionPopup.visibleRowCountProperty(),
-                                    Bindings.size(suggestionList.getItems()))
-                            .multiply(24));
-            suggestionListField.setAccessible(false);
-            autoCompletionPopup.setSkin(skin);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            log.error("Failed overriding suggestionList height binding", e);
-        }
-
-        if (this.configuration.isEnableDarkMode()) {
-            autoCompletionPopup.setStyle("""
-                    -fx-control-inner-background:#333;
-                    -fx-selection-bar-non-focused:#515151;
-                    """);
+        if (this.configuration.isEnableSuggestions()) {
+            bindAutocompletion();
         }
     }
 
@@ -435,6 +404,43 @@ public class MainController implements Initializable {
                 new ReadOnlyStringWrapper(
                         FTSDocsApplication.DATE_TIME_FORMATTER.format(
                                 c.getValue().getLastModifiedTime().toInstant())));
+    }
+
+    @SuppressWarnings({"unchecked", "java:S3011"})
+    private void bindAutocompletion() {
+        AutoCompletionBinding<String> completionBinding = TextFields.bindAutoCompletion(
+                this.searchTextField, param -> {
+                    String userText = param.getUserText();
+                    if (!userText.isBlank()) {
+                        return ftsService.getSuggestions(userText);
+                    }
+                    return Collections.emptyList();
+                });
+
+        AutoCompletePopup<String> autoCompletionPopup = completionBinding.getAutoCompletionPopup();
+        AutoCompletePopupSkin<String> skin = new AutoCompletePopupSkin<>(autoCompletionPopup);
+        autoCompletionPopup.prefWidthProperty().bind(this.searchTextField.widthProperty());
+
+        try {
+            Field suggestionListField = skin.getClass().getDeclaredField("suggestionList");
+            suggestionListField.setAccessible(true);
+            ListView<String> suggestionList = (ListView<String>) suggestionListField.get(skin);
+            suggestionList.prefHeightProperty().bind(
+                    Bindings.min(autoCompletionPopup.visibleRowCountProperty(),
+                                    Bindings.size(suggestionList.getItems()))
+                            .multiply(24));
+            suggestionListField.setAccessible(false);
+            autoCompletionPopup.setSkin(skin);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            log.error("Failed overriding suggestionList height binding", e);
+        }
+
+        if (this.configuration.isEnableDarkMode()) {
+            autoCompletionPopup.setStyle("""
+                    -fx-control-inner-background:#333;
+                    -fx-selection-bar-non-focused:#515151;
+                    """);
+        }
     }
 
     private ObservableValue<? extends Number> getFileNameColumnSize() {

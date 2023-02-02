@@ -52,11 +52,12 @@ public class SolrService implements FullTextSearchService {
     private final ContentExtractor contentExtractor;
     private final ExecutorService executor;
     private final Configuration configuration;
-    private final DirectoryWatcherManager watcherManager;
+    private DirectoryWatcherManager watcherManager;
 
     private static final String HIGHLIGHT_PREFIX = "<b>";
     private static final String HIGHLIGHT_POSTFIX = "</b>";
-    private static final Pattern SUGGESTION_HIGHLIGHT_PATTERN = Pattern.compile(HIGHLIGHT_PREFIX + "(.*?)" + HIGHLIGHT_POSTFIX);
+    private static final Pattern SUGGESTION_HIGHLIGHT_PATTERN = Pattern.compile(
+            HIGHLIGHT_PREFIX + "(.*?)" + HIGHLIGHT_POSTFIX);
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public SolrService(
@@ -68,7 +69,6 @@ public class SolrService implements FullTextSearchService {
         this.configuration = configuration;
         this.executor = Executors.newCachedThreadPool(
                 new CustomizableThreadFactory("Indexing thread-"));
-        this.watcherManager = new DirectoryWatcherManager(this, this.configuration);
 
         updateIndices();
         if (this.configuration.isEnableFileWatcher()) {
@@ -140,8 +140,8 @@ public class SolrService implements FullTextSearchService {
             }
             String substring = term.substring(start, end);
             String word = highlighted + substring;
-            word = word.replace(HIGHLIGHT_PREFIX,"");
-            word = word.replace(HIGHLIGHT_POSTFIX,"");
+            word = word.replace(HIGHLIGHT_PREFIX, "");
+            word = word.replace(HIGHLIGHT_POSTFIX, "");
             highlightedWords.add(word.toLowerCase());
         }
         return highlightedWords;
@@ -178,15 +178,7 @@ public class SolrService implements FullTextSearchService {
                 List<IndexLocation> actualFiles = locations.parallelStream()
                         .flatMap(loc -> {
                             loc.setIndexStatus(IndexStatus.READING_FILE_TREE);
-                            List<IndexLocation> files = FileSystemUtils.readFileTree(loc.getRoot())
-                                    .stream()
-                                    .filter(configuration::isFileFormatSupported)
-                                    .map(file -> new IndexLocation(
-                                            file,
-                                            false,
-                                            IndexStatus.EXTRACTING_CONTENT,
-                                            WatcherStatus.UNKNOWN))
-                                    .toList();
+                            List<IndexLocation> files = extractChildLocations(loc);
                             loc.setIndexedFiles(new ArrayList<>(files));
                             return files.stream();
                         })
@@ -247,15 +239,7 @@ public class SolrService implements FullTextSearchService {
                         .parallelStream()
                         .flatMap(location -> {
                             location.setIndexStatus(IndexStatus.UPDATING);
-                            List<IndexLocation> files = FileSystemUtils.readFileTree(
-                                            location.getRoot()).stream()
-                                    .filter(configuration::isFileFormatSupported)
-                                    .map(file -> new IndexLocation(
-                                            file,
-                                            false,
-                                            IndexStatus.EXTRACTING_CONTENT,
-                                            WatcherStatus.UNKNOWN))
-                                    .toList();
+                            Collection<IndexLocation> files = extractChildLocations(location);
                             location.setIndexedFiles(new ArrayList<>(files));
                             return files.stream();
                         })
@@ -266,6 +250,18 @@ public class SolrService implements FullTextSearchService {
             }
         };
         executor.execute(task);
+    }
+
+    private List<IndexLocation> extractChildLocations(IndexLocation location) {
+        return FileSystemUtils.readFileTree(
+                        location.getRoot()).stream()
+                .filter(configuration::isFileFormatSupported)
+                .map(file -> new IndexLocation(
+                        file,
+                        false,
+                        IndexStatus.EXTRACTING_CONTENT,
+                        WatcherStatus.UNKNOWN))
+                .toList();
     }
 
     private void deleteFilesNotInCollection(Collection<IndexLocation> actualFiles) {

@@ -20,7 +20,7 @@ public class CheckComboBoxEditor<T extends Checkable> extends
 
     private ListProperty<T> list;
 
-    private boolean initialized = false;
+    private boolean initialized;
 
     @SuppressWarnings("unchecked")
     public CheckComboBoxEditor(Item property) {

@@ -17,9 +17,10 @@ import org.controlsfx.control.PropertySheet;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.configuration.Category;
 import ftsdocs.configuration.Configuration;
+import ftsdocs.controls.BooleanPropertyEditor;
+import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.model.DocumentType;
 import ftsdocs.model.PropertyItem;
 import ftsdocs.view.View;
@@ -79,7 +80,8 @@ public class SettingsController implements Initializable {
                         boolean.class,
                         "Enable dark mode",
                         "Enables/disables dark theme of application.",
-                        Category.APPEARANCE.getDisplayName()) {
+                        Category.APPEARANCE.getDisplayName(),
+                        BooleanPropertyEditor.class) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.isEnableDarkMode();
@@ -129,6 +131,23 @@ public class SettingsController implements Initializable {
 
         //region Searching
 
+        propertySheet.getItems().add(new PropertyItem(
+                boolean.class,
+                "Enable suggestions",
+                "Enables display of autocompletion suggestions of possible search phrases",
+                Category.SEARCHING.getDisplayName(),
+                BooleanPropertyEditor.class) {
+            @Override
+            public Object getValue() {
+                return tempConfiguration.isEnableSuggestions();
+            }
+
+            @Override
+            public void setValue(Object value) {
+                tempConfiguration.setEnableSuggestions((boolean) value);
+            }
+        });
+
         propertySheet.getItems()
                 .add(new PropertyItem(
                         int.class,
@@ -173,10 +192,12 @@ public class SettingsController implements Initializable {
                         "Enable file watcher",
                         """
                                 Enable/disable automatic updates of indices based on file system events.
-                                Improves performance if disabled, but any changes in the file system will be updated only after application is restarted or location is re-indexed.
+                                Improves performance if disabled
+                                Disable it if indexed locations and files are not expected to be modified after indexing.
+                                Changes will apply after application restart
                                 """,
                         Category.INDEXING.getDisplayName(),
-                        null) {
+                        BooleanPropertyEditor.class) {
                     @Override
                     public Object getValue() {
                         return tempConfiguration.isEnableFileWatcher();
