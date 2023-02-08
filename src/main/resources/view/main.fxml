@@ -37,7 +37,7 @@
             <Insets />
           </HBox.margin>
         </Button>
-        <TextField fx:id="searchTextField" onKeyPressed="#searchKeyClick" HBox.hgrow="ALWAYS">
+        <TextField fx:id="searchTextField" onKeyPressed="#searchKeyClick" promptText="Type search query here..." HBox.hgrow="ALWAYS">
           <HBox.margin>
             <Insets />
           </HBox.margin>

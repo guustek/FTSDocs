@@ -2,6 +2,11 @@
   -fx-fill: rgb(0, 0, 0);
 }
 
+.error{
+  -fx-border-color: red;
+  -fx-border-width: 2px;
+}
+
 .highlight {
   -fx-font-weight: bold;
 }

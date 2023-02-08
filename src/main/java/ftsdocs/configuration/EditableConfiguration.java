@@ -25,7 +25,8 @@ public abstract class EditableConfiguration {
 
     private static final Set<DocumentType> DEFAULT_DOCUMENT_TYPES = Set.of(
             new DocumentType("PDF file", true, "pdf"),
-            new DocumentType("Microsoft Word Document", true, ".doc", "*.DOCX")
+            new DocumentType("Microsoft Word Document", true, "doc", "docx"),
+            new DocumentType("Open Document", true, "odt")
     );
 
     //region Appearance

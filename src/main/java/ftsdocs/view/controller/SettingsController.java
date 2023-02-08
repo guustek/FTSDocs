@@ -22,7 +22,6 @@ import ftsdocs.configuration.Configuration;
 import ftsdocs.controls.BooleanPropertyEditor;
 import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.model.DocumentType;
-import ftsdocs.model.NotificationTitle;
 import ftsdocs.model.PropertyItem;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
@@ -53,7 +52,6 @@ public class SettingsController implements Initializable {
     @FXML
     private void resetClick() {
         tempConfiguration.copyFrom(configuration);
-        viewManager.showNotification(NotificationTitle.INFORMATION, "Settings changes discarded", null);
         viewManager.changeScene(View.SETTINGS);
     }
 
@@ -62,7 +60,6 @@ public class SettingsController implements Initializable {
         configuration.reset();
         configuration.writeToFile();
         tempConfiguration.copyFrom(configuration);
-        viewManager.showNotification(NotificationTitle.INFORMATION, "Settings restarted to defaults", null);
         viewManager.changeScene(View.SETTINGS);
     }
 
@@ -70,7 +67,6 @@ public class SettingsController implements Initializable {
     private void applyClick() {
         configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
-        viewManager.showNotification(NotificationTitle.INFORMATION, "Settings saved", null);
         viewManager.changeScene(View.SETTINGS);
     }
 
@@ -235,8 +231,9 @@ public class SettingsController implements Initializable {
                     @Override
                     public void setValue(Object value) {
                         Collection<DocumentType> selectedDocumentTypes = ((Collection<DocumentType>) value);
-                        tempConfiguration.getDocumentTypes().forEach(
-                                doc -> doc.setEnabled(selectedDocumentTypes.contains(doc)));
+                        tempConfiguration.getDocumentTypes().addAll(selectedDocumentTypes);
+                        tempConfiguration.getDocumentTypes().forEach(type ->
+                                type.setEnabled(selectedDocumentTypes.contains(type)));
                     }
                 });
 

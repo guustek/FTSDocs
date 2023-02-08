@@ -8,17 +8,20 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.AbstractPropertyEditor;
 
 import ftsdocs.model.Checkable;
+import ftsdocs.model.DocumentType;
 
-public class CheckComboBoxEditor<T extends Checkable> extends
-        AbstractPropertyEditor<ObservableList<T>, CheckComboBox<T>> {
+public class CheckComboBoxEditor extends
+        AbstractPropertyEditor<ObservableList<DocumentType>, CheckComboBox<DocumentType>> {
 
-    private ListProperty<T> list;
+    private ListProperty<DocumentType> list;
 
     private boolean initialized;
 
@@ -26,8 +29,20 @@ public class CheckComboBoxEditor<T extends Checkable> extends
     public CheckComboBoxEditor(Item property) {
         super(property, new CheckComboBox<>());
         this.initialized = false;
-        ObservableValue<T> observable = (ObservableValue<T>) property.getValue();
-        Collection<T> values = (Collection<T>) observable.getValue();
+
+        MenuItem addFormatMenuItem = new MenuItem("Add new document format");
+        addFormatMenuItem.setOnAction(event -> {
+            NewItemPopOver popover = new NewItemPopOver();
+            popover.setOnApplyCallback(documentType -> {
+                getEditor().getItems().add(documentType);
+                getEditor().getCheckModel().check(documentType);
+            });
+            popover.show(addFormatMenuItem.getParentPopup().getOwnerWindow());
+
+        });
+        this.getEditor().setContextMenu(new ContextMenu(addFormatMenuItem));
+        ObservableValue<DocumentType> observable = (ObservableValue<DocumentType>) property.getValue();
+        Collection<DocumentType> values = (Collection<DocumentType>) observable.getValue();
         this.getEditor().getItems().setAll(values);
         this.getEditor().getCheckModel().clearChecks();
         values.stream()
@@ -39,10 +54,10 @@ public class CheckComboBoxEditor<T extends Checkable> extends
 
     @SuppressWarnings("unchecked")
     @Override
-    protected ListProperty<T> getObservableValue() {
+    protected ListProperty<DocumentType> getObservableValue() {
         if (this.list == null && !this.initialized) {
-            ObservableValue<T> observable = (ObservableValue<T>) getProperty().getValue();
-            Collection<T> values = (Collection<T>) observable.getValue();
+            ObservableValue<DocumentType> observable = (ObservableValue<DocumentType>) getProperty().getValue();
+            Collection<DocumentType> values = (Collection<DocumentType>) observable.getValue();
             this.list = new SimpleListProperty<>(
                     FXCollections.observableArrayList(new ArrayList<>(values)));
         }
@@ -50,7 +65,7 @@ public class CheckComboBoxEditor<T extends Checkable> extends
     }
 
     @Override
-    public void setValue(ObservableList<T> value) {
+    public void setValue(ObservableList<DocumentType> value) {
         value.stream()
                 .filter(Checkable::isChecked)
                 .forEach(v -> this.getEditor().getCheckModel().check(v));

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefWidth="380.0" spacing="15.0" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1">
+  <padding>
+    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+  </padding>
+  <Label alignment="TOP_LEFT" style="-fx-font-weight: bold;" text="New document format">
+    <font>
+      <Font size="15.0" />
+    </font>
+  </Label>
+  <TextField fx:id="nameTextField" alignment="TOP_LEFT" promptText="Enter document format name" />
+  <TextField fx:id="extensionsTextField" alignment="TOP_LEFT" promptText="Enter extensions separated by commas, for example 'txt, pdf'" />
+  <HBox alignment="CENTER">
+    <Button fx:id="applyButton" text="Confirm" HBox.hgrow="NEVER" />
+  </HBox>
+</VBox>
