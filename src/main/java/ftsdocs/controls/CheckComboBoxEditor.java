@@ -33,6 +33,7 @@ public class CheckComboBoxEditor extends
         MenuItem addFormatMenuItem = new MenuItem("Add new document format");
         addFormatMenuItem.setOnAction(event -> {
             NewItemPopOver popover = new NewItemPopOver();
+            popover.getStyleClass().add("background");
             popover.setOnApplyCallback(documentType -> {
                 getEditor().getItems().add(documentType);
                 getEditor().getCheckModel().check(documentType);
