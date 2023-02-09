@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,11 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SuggesterResponse;
 import org.apache.solr.client.solrj.response.Suggestion;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
@@ -117,7 +120,6 @@ public class SolrService implements FullTextSearchService {
             List<Suggestion> suggestions = suggesterResponse.getSuggestions().get("mySuggester");
             suggestions.forEach(
                     suggestion -> result.addAll(extractTermsFromHighlights(suggestion.getTerm())));
-            log.info("");
         } catch (SolrServerException | IOException e) {
             log.error("Error while fetching suggestions for phrase: {}", searchPhrase, e);
         }
@@ -271,7 +273,28 @@ public class SolrService implements FullTextSearchService {
     }
 
     private void deleteFilesNotInCollection(Collection<IndexLocation> actualFiles) {
-        List<Path> toBeDeleted = searchDocuments("*").stream()
+        Collection<Document> allIndexedDocs = new LinkedList<>();
+        try {
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setRows(100);
+            solrQuery.setQuery("*:*");
+            solrQuery.addSort(FieldName.PATH, ORDER.asc);
+            String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+            boolean done = false;
+            while (!done) {
+                solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+                QueryResponse rsp = client.query(solrQuery);
+                String nextCursorMark = rsp.getNextCursorMark();
+                allIndexedDocs.addAll(rsp.getBeans(Document.class));
+                if (cursorMark.equals(nextCursorMark)) {
+                    done = true;
+                }
+                cursorMark = nextCursorMark;
+            }
+        } catch (Exception ignored) {
+        }
+
+        List<Path> toBeDeleted = allIndexedDocs.stream()
                 .map(doc -> new IndexLocation(new File(doc.getPath()), false))
                 .filter(path -> !actualFiles.contains(path))
                 .map(loc -> loc.getRoot().toPath())

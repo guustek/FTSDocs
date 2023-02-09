@@ -133,6 +133,23 @@ public class SettingsController implements Initializable {
 
         propertySheet.getItems().add(new PropertyItem(
                 boolean.class,
+                "Enable search with synonyms",
+                "Enables matching of synonyms when searching",
+                Category.SEARCHING.getDisplayName(),
+                BooleanPropertyEditor.class) {
+            @Override
+            public Object getValue() {
+                return tempConfiguration.isEnableSynonymSearch();
+            }
+
+            @Override
+            public void setValue(Object value) {
+                tempConfiguration.setEnableSynonymSearch((boolean) value);
+            }
+        });
+
+        propertySheet.getItems().add(new PropertyItem(
+                boolean.class,
                 "Enable suggestions",
                 "Enables display of autocompletion suggestions of possible search phrases",
                 Category.SEARCHING.getDisplayName(),

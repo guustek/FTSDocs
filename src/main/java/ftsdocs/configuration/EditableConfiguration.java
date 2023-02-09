@@ -41,6 +41,8 @@ public abstract class EditableConfiguration {
 
     //region Searching
 
+    private boolean enableSynonymSearch;
+
     private boolean enableSuggestions;
 
     private int maxSearchResults;
@@ -65,6 +67,7 @@ public abstract class EditableConfiguration {
         this.highlightColor = Color.rgb(0, 120, 215);
         this.contentFontSize = 14;
 
+        this.enableSynonymSearch = true;
         this.enableSuggestions = true;
         this.maxSearchResults = 100;
         this.maxPhraseHighlights = 100;
@@ -78,6 +81,7 @@ public abstract class EditableConfiguration {
         this.highlightColor = configuration.getHighlightColor();
         this.contentFontSize = configuration.getContentFontSize();
 
+        this.enableSynonymSearch = configuration.isEnableSynonymSearch();
         this.enableSuggestions = configuration.isEnableSuggestions();
         this.maxSearchResults = configuration.getMaxSearchResults();
         this.maxPhraseHighlights = configuration.getMaxPhraseHighlights();
