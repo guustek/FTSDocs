@@ -67,7 +67,7 @@ public abstract class EditableConfiguration {
         this.highlightColor = Color.rgb(0, 120, 215);
         this.contentFontSize = 14;
 
-        this.enableSynonymSearch = true;
+        this.enableSynonymSearch = false;
         this.enableSuggestions = true;
         this.maxSearchResults = 100;
         this.maxPhraseHighlights = 100;

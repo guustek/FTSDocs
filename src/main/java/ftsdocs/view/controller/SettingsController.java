@@ -65,9 +65,12 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void applyClick() {
+        boolean shouldReload = configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
         configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
-        viewManager.changeScene(View.SETTINGS);
+        if(shouldReload){
+            viewManager.changeScene(View.SETTINGS);
+        }
     }
 
     @SuppressWarnings("java:S2696")
