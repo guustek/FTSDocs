@@ -18,7 +18,7 @@
         <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.SynonymFilterFactory" expand="true" ignoreCase="true"
-                synonyms="synonyms.txt"/>
+                synonyms="lang/synonyms/synonyms_pl.txt"/>
       </analyzer>
     </fieldType>
 

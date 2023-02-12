@@ -126,6 +126,7 @@ public class SolrService implements FullTextSearchService {
             Set<Character> wordEndCharacters = Set.of(
                     ' ',
                     '\n',
+                    '\r',
                     '.',
                     ','
             );
@@ -159,7 +160,6 @@ public class SolrService implements FullTextSearchService {
 
     public void indexLocations(
             Collection<IndexLocation> locations,
-            boolean updateWatcher,
             EventHandler<WorkerStateEvent> successHandler) {
 
         Task<Collection<Document>> indexingTask = new Task<>() {
@@ -192,13 +192,15 @@ public class SolrService implements FullTextSearchService {
         indexingTask.setOnSucceeded(successHandler);
         executor.execute(indexingTask);
 
-        if (updateWatcher) {
+        if (configuration.isEnableFileWatcher()) {
             log.info("Starting watchers update task for locations: {}",
                     FTSDocsApplication.GSON.toJson(
                             locations.stream()
                                     .map(loc -> loc.getRoot().getAbsolutePath())
                                     .toList()));
             this.watcherManager.updateWatchers(locations);
+        } else {
+            configuration.getIndexedLocations().values().forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
         }
     }
 
@@ -225,6 +227,19 @@ public class SolrService implements FullTextSearchService {
             }
         };
         executor.execute(task);
+    }
+
+    @Override
+    public void updateFileWatcher() {
+        if (this.configuration.isEnableFileWatcher()) {
+            if (watcherManager == null) {
+                this.watcherManager = new DirectoryWatcherManager(this, this.configuration);
+            }
+            this.watcherManager.updateWatchers(this.configuration.getIndexedLocations().values());
+        } else {
+            this.watcherManager = null;
+            this.configuration.getIndexedLocations().values().forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
+        }
     }
 
     private void updateIndices() {

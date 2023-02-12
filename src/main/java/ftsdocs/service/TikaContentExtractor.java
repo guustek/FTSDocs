@@ -1,16 +1,15 @@
 package ftsdocs.service;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
-
+import ftsdocs.model.Document;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 
-import ftsdocs.model.Document;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -20,6 +19,7 @@ public class TikaContentExtractor implements ContentExtractor {
 
     public TikaContentExtractor() {
         this.tika = new Tika();
+        this.tika.setMaxStringLength(1024 * 1024 * 5);
     }
 
     public Document getDocumentFromFile(File file) {

@@ -1,30 +1,29 @@
 package ftsdocs.view.controller;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.paint.Color;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.controlsfx.control.PropertySheet;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
 import ftsdocs.configuration.Category;
 import ftsdocs.configuration.Configuration;
 import ftsdocs.controls.BooleanPropertyEditor;
 import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.model.DocumentType;
 import ftsdocs.model.PropertyItem;
+import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.paint.Color;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.controlsfx.control.PropertySheet;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import java.net.URL;
+import java.util.Collection;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,6 +39,8 @@ public class SettingsController implements Initializable {
     private Configuration tempConfiguration;
 
     private final ViewManager viewManager;
+
+    private final FullTextSearchService ftsService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -57,19 +58,21 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void resetDefaultClick() {
-        configuration.reset();
-        configuration.writeToFile();
         tempConfiguration.copyFrom(configuration);
-        viewManager.changeScene(View.SETTINGS);
+        applyClick();
     }
 
     @FXML
     private void applyClick() {
-        boolean shouldReload = configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
+        boolean shouldReloadView = configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
+        boolean shouldUpdateFileWatcher = configuration.isEnableFileWatcher() != tempConfiguration.isEnableFileWatcher();
         configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
-        if(shouldReload){
+        if(shouldReloadView){
             viewManager.changeScene(View.SETTINGS);
+        }
+        if(shouldUpdateFileWatcher){
+            ftsService.updateFileWatcher();
         }
     }
 

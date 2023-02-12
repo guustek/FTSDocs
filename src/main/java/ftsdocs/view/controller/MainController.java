@@ -1,22 +1,16 @@
 package ftsdocs.view.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.FileSystemUtils;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.controls.FileContextMenu;
+import ftsdocs.model.Document;
+import ftsdocs.model.HighlightSnippet;
+import ftsdocs.model.NotificationTitle;
+import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.ViewManager;
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -28,28 +22,13 @@ import javafx.css.Rule;
 import javafx.css.Stylesheet;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-
-import impl.org.controlsfx.skin.AutoCompletePopup;
-import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -60,15 +39,14 @@ import org.fxmisc.richtext.InlineCssTextArea;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.FileSystemUtils;
-import ftsdocs.configuration.Configuration;
-import ftsdocs.controls.FileContextMenu;
-import ftsdocs.model.Document;
-import ftsdocs.model.HighlightSnippet;
-import ftsdocs.model.NotificationTitle;
-import ftsdocs.service.FullTextSearchService;
-import ftsdocs.view.ViewManager;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -101,6 +79,8 @@ public class MainController implements Initializable {
     private List<HighlightSnippet> currentHighlights;
 
     private int currentHighlightIndex;
+
+    private static String currentQuery = "";
 
     //region FXML fields
 
@@ -192,6 +172,8 @@ public class MainController implements Initializable {
         if (this.configuration.isEnableSuggestions()) {
             bindAutocompletion();
         }
+        this.searchTextField.setText(currentQuery);
+        this.searchTextField.textProperty().addListener((observable, oldValue, newValue) -> currentQuery = newValue);
     }
 
     private void search() {

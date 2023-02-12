@@ -1,29 +1,5 @@
 package ftsdocs.view.controller;
 
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.HyperlinkLabel;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-
 import ftsdocs.configuration.Configuration;
 import ftsdocs.model.Document;
 import ftsdocs.model.IndexLocation;
@@ -31,6 +7,24 @@ import ftsdocs.model.NotificationTitle;
 import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.controlsfx.control.HyperlinkLabel;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -118,7 +112,6 @@ public class MenuController implements Initializable {
 
         this.ftsService.indexLocations(
                 indexLocations,
-                this.configuration.isEnableFileWatcher(),
                 event -> {
                     Collection<Document> value = ((Collection<Document>) event.getSource()
                             .getValue());

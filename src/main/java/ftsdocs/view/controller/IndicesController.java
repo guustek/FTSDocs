@@ -73,7 +73,6 @@ public class IndicesController implements Initializable {
                         menuItem.setOnAction(event -> {
                             ftsService.indexLocations(
                                     Collections.singleton(item),
-                                    configuration.isEnableFileWatcher(),
                                     ev -> {
                                         Collection<Document> value = ((Collection<Document>) ev.getSource()
                                                 .getValue());

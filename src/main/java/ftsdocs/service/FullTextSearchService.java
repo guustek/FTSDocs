@@ -1,14 +1,13 @@
 package ftsdocs.service;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.Collection;
-
+import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
-import ftsdocs.model.Document;
-import ftsdocs.model.IndexLocation;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.Collection;
 
 public interface FullTextSearchService {
 
@@ -18,9 +17,10 @@ public interface FullTextSearchService {
 
     void deleteFromIndex(Collection<Path> path);
 
-    void indexLocations(Collection<IndexLocation> locations, boolean updateWatcher,
-            EventHandler<WorkerStateEvent> successHandler);
+    void indexLocations(Collection<IndexLocation> locations, EventHandler<WorkerStateEvent> successHandler);
 
     void updateLocation(IndexLocation indexLocation, File file);
+
+    void updateFileWatcher();
 
 }
