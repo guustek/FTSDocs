@@ -1,26 +1,13 @@
 package ftsdocs.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.FileSystemUtils;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.model.*;
+import ftsdocs.server.FullTextSearchServer;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.solr.client.solrj.SolrClient;
@@ -36,15 +23,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.FileSystemUtils;
-import ftsdocs.configuration.Configuration;
-import ftsdocs.model.Document;
-import ftsdocs.model.FieldName;
-import ftsdocs.model.IndexLocation;
-import ftsdocs.model.IndexStatus;
-import ftsdocs.model.WatcherStatus;
-import ftsdocs.server.FullTextSearchServer;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -95,7 +81,8 @@ public class SolrService implements FullTextSearchService {
             Map<String, Map<String, List<String>>> highlighting = response.getHighlighting();
             for (Document document : documents) {
                 Map<String, List<String>> highlightsForPath = highlighting.get(document.getPath());
-                List<String> highlightsForField = highlightsForPath.getOrDefault(FieldName.CONTENT,
+                List<String> highlightsForField = highlightsForPath.getOrDefault(
+                        configuration.isEnableSynonymSearch() ? FieldName.CONTENT_SYNONYMS : FieldName.CONTENT,
                         Collections.singletonList(null));
                 document.setHighlight(highlightsForField.get(0));
             }
@@ -109,15 +96,18 @@ public class SolrService implements FullTextSearchService {
 
     @Override
     public Collection<String> getSuggestions(String searchPhrase) {
+        //String suggesterName = configuration.isEnableSynonymSearch() ? "suggester_synonyms" : "suggester";
+        String suggesterName = "suggester";
         SolrQuery query = new SolrQuery()
                 .setRequestHandler("/suggest")
                 .setParam("suggest", "true")
-                .setParam("suggest.q", searchPhrase);
+                .setParam("suggest.q", searchPhrase)
+                .setParam("suggest.dictionary", suggesterName);
         Set<String> result = new HashSet<>();
         try {
             QueryResponse response = this.client.query(query);
             SuggesterResponse suggesterResponse = response.getSuggesterResponse();
-            List<Suggestion> suggestions = suggesterResponse.getSuggestions().get("mySuggester");
+            List<Suggestion> suggestions = suggesterResponse.getSuggestions().getOrDefault(suggesterName, List.of());
             suggestions.forEach(
                     suggestion -> result.addAll(extractTermsFromHighlights(suggestion.getTerm())));
         } catch (SolrServerException | IOException e) {
@@ -371,7 +361,9 @@ public class SolrService implements FullTextSearchService {
 
     private SolrQuery prepareSearchQuery(String query) {
         return new SolrQuery()
-                .setParam(CommonParams.DF, FieldName.CONTENT)
+                .setParam(CommonParams.DF, configuration.isEnableSynonymSearch()
+                        ? FieldName.CONTENT_SYNONYMS
+                        : FieldName.CONTENT)
                 //.setParam(CommonParams.FL, "*", "score")
                 //.setParam(HighlightParams.SCORE_K1, "0")
                 .setHighlight(true)
