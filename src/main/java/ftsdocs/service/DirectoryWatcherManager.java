@@ -1,6 +1,18 @@
 package ftsdocs.service;
 
-import java.io.File;
+import ftsdocs.IndexedFilesVisitor;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.WatcherStatus;
+import io.methvin.watcher.DirectoryChangeEvent;
+import io.methvin.watcher.DirectoryChangeEvent.EventType;
+import io.methvin.watcher.DirectoryWatcher;
+import io.methvin.watcher.hashing.FileHasher;
+import javafx.concurrent.Task;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -9,21 +21,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javafx.concurrent.Task;
-
-import io.methvin.watcher.DirectoryChangeEvent;
-import io.methvin.watcher.DirectoryChangeEvent.EventType;
-import io.methvin.watcher.DirectoryWatcher;
-import io.methvin.watcher.hashing.FileHasher;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
-
-import ftsdocs.configuration.Configuration;
-import ftsdocs.IndexedFilesVisitor;
-import ftsdocs.model.IndexLocation;
-import ftsdocs.model.IndexStatus;
-import ftsdocs.model.WatcherStatus;
 
 @Slf4j
 public class DirectoryWatcherManager {
@@ -102,8 +99,7 @@ public class DirectoryWatcherManager {
                 IndexLocation indexLocation = this.configuration.getIndexedLocations()
                         .get(sourcePath.toString());
                 if (indexLocation != null) {
-                    File file = event.path().toFile();
-                    ftsService.updateLocation(indexLocation, file);
+                    ftsService.indexLocations(Collections.singletonList(indexLocation),null);
                     if (indexLocation.getIndexedFiles().stream()
                             .allMatch(loc -> loc.getIndexStatus() == IndexStatus.FAILED)) {
                         indexLocation.setIndexStatus(IndexStatus.FAILED);

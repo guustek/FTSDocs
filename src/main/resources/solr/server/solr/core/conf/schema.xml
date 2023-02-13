@@ -10,12 +10,12 @@
     <fieldType name="text_general_synonyms" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+        <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+        <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.SynonymFilterFactory" expand="true" ignoreCase="true"
                 synonyms="lang/synonyms/synonyms_pl.txt"/>
@@ -25,12 +25,12 @@
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+        <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" words="stopwords.txt" ignoreCase="true"/>
+        <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
