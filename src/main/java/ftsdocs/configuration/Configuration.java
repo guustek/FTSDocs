@@ -1,15 +1,14 @@
 package ftsdocs.configuration;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.google.gson.annotations.JsonAdapter;
+import ftsdocs.model.IndexLocation;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.model.IndexLocation;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
@@ -29,24 +28,17 @@ public class Configuration extends EditableConfiguration {
 
     public Configuration() {
         reset();
+        this.indexedLocations = new ConcurrentHashMap<>();
     }
 
     public Configuration(Configuration configuration) {
         this.copyFrom(configuration);
-    }
-
-    @Override
-    public void reset() {
-        super.reset();
-        this.width = 900;
-        this.height = 700;
-        this.indexedLocations = new ConcurrentHashMap<>();
+        this.width = configuration.getWidth();
+        this.height = configuration.getHeight();
     }
 
     public void copyFrom(Configuration configuration) {
         super.copyFrom(configuration);
-        this.width = configuration.getWidth();
-        this.height = configuration.getHeight();
         this.indexedLocations = new ConcurrentHashMap<>(configuration.getIndexedLocations());
     }
 }

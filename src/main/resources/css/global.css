@@ -2,6 +2,26 @@
   -fx-fill: rgb(0, 0, 0);
 }
 
+.button {
+  -fx-background-color: transparent;
+  -fx-border-radius: 50px;
+  -fx-background-radius: 50px;
+  -fx-font-size: 15;
+}
+
+.button:disabled{
+  -fx-background-color: transparent;
+}
+
+.button:focused, .button:pressed{
+  -fx-border-color: transparent, black;
+  -fx-border-radius: 50px;
+}
+
+.progress-indicator:indeterminate > .spinner {
+  -fx-border-color: transparent;
+}
+
 .error{
   -fx-border-color: red;
   -fx-border-width: 2px;
@@ -16,7 +36,6 @@
   -fx-border-width: 1.5px;
   -fx-padding: 10px;
 }
-
 
 /* region notification */
 

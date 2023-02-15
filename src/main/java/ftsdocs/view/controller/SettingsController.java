@@ -52,14 +52,14 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void resetClick() {
-        tempConfiguration.copyFrom(configuration);
         viewManager.changeScene(View.SETTINGS);
     }
 
     @FXML
     private void resetDefaultClick() {
-        tempConfiguration.copyFrom(configuration);
-        applyClick();
+        configuration.reset();
+        configuration.writeToFile();
+        viewManager.changeScene(View.SETTINGS);
     }
 
     @FXML

@@ -31,7 +31,7 @@
       </VBox.margin>
     </Label>
   </HBox>
-  <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#homeClick" text="Home">
+  <Button alignment="TOP_LEFT" focusTraversable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#homeClick" text="Home">
     <VBox.margin>
       <Insets left="1.0" />
     </VBox.margin>
@@ -40,7 +40,7 @@
     </font>
     <graphic>
       <ImageView fitHeight="20.0" fitWidth="20.0" focusTraversable="true" pickOnBounds="true" preserveRatio="true">
-        <Image url="@../icon/home_icon.png" />
+        <Image url="@../icon/light/home_icon.png" />
       </ImageView>
     </graphic>
   </Button>
@@ -53,7 +53,7 @@
     </font>
     <graphic>
       <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="@../icon/files_icon.png" />
+        <Image url="@../icon/light/files_icon.png" />
       </ImageView>
     </graphic>
   </Button>
@@ -63,7 +63,7 @@
     </font>
     <graphic>
       <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-        <Image url="@../icon/settings_icon.png" />
+        <Image url="@../icon/light/settings_icon.png" />
       </ImageView>
     </graphic>
   </Button>

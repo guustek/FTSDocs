@@ -1,13 +1,13 @@
 package ftsdocs.view;
 
-import java.io.IOException;
-
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.model.NotificationTitle;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import jfxtras.styles.jmetro.Style;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +15,7 @@ import org.controlsfx.control.Notifications;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.configuration.Configuration;
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.model.NotificationTitle;
+import java.io.IOException;
 
 @Slf4j
 @RequiredArgsConstructor

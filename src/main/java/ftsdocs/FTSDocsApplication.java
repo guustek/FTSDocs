@@ -1,5 +1,25 @@
 package ftsdocs;
 
+import com.google.gson.*;
+import ftsdocs.configuration.Configuration;
+import ftsdocs.server.FullTextSearchServer;
+import ftsdocs.view.View;
+import ftsdocs.view.ViewManager;
+import ftsdocs.view.ViewManagerImpl;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -10,35 +30,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
-
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SystemUtils;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-
-import ftsdocs.configuration.Configuration;
-import ftsdocs.server.FullTextSearchServer;
-import ftsdocs.view.View;
-import ftsdocs.view.ViewManager;
-import ftsdocs.view.ViewManagerImpl;
 
 @Slf4j
 @ComponentScan

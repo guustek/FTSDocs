@@ -11,11 +11,32 @@
   -fx-font-weight: bold;
 }
 
+.button {
+  -fx-background-color: transparent;
+  -fx-border-radius: 50px;
+  -fx-background-radius: 50px;
+  -fx-font-size: 15;
+}
+
+.button:disabled{
+  -fx-background-color: transparent;
+}
+
+.button:focused, .button:pressed{
+  -fx-border-color: transparent, focus_ring_border_color;
+  -fx-border-radius: 50px;
+}
+
+.progress-indicator:indeterminate > .spinner {
+  -fx-border-color: transparent;
+}
+
 .matches-box {
   -fx-border-color: rgb(23, 23, 23);
   -fx-border-width: 1.5px;
   -fx-padding: 10px;
 }
+
 
 /* region textfield */
 

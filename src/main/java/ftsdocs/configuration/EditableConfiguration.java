@@ -1,22 +1,20 @@
 package ftsdocs.configuration;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.model.DocumentType;
 import javafx.scene.paint.Color;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.model.DocumentType;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Getter
@@ -26,7 +24,8 @@ public abstract class EditableConfiguration {
     private static final Set<DocumentType> DEFAULT_DOCUMENT_TYPES = Set.of(
             new DocumentType("PDF file", true, "pdf"),
             new DocumentType("Microsoft Word Document", true, "doc", "docx"),
-            new DocumentType("Open Document", true, "odt")
+            new DocumentType("Open Document", true, "odt"),
+            new DocumentType("Text file", true, "txt")
     );
 
     //region Appearance
