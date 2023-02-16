@@ -4,11 +4,10 @@ import ftsdocs.model.Document;
 import ftsdocs.model.IndexLocation;
 import ftsdocs.model.NotificationTitle;
 import ftsdocs.model.configuration.Configuration;
-import ftsdocs.view.View;
 import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -22,15 +21,17 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 @Lazy
-public class MenuController implements Initializable {
+public class MenuController {
 
     private final FullTextSearchService ftsService;
 
@@ -39,11 +40,6 @@ public class MenuController implements Initializable {
     private final ViewManager viewManager;
     @FXML
     private VBox root;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
 
     @FXML
     private void indexFilesButtonClicked() {

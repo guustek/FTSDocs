@@ -37,6 +37,13 @@ public class Configuration extends EditableConfiguration {
         this.height = configuration.getHeight();
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        this.width = 900;
+        this.height = 700;
+    }
+
     public void copyFrom(Configuration configuration) {
         super.copyFrom(configuration);
         this.indexedLocations = new ConcurrentHashMap<>(configuration.getIndexedLocations());

@@ -7,19 +7,21 @@
 <?import javafx.scene.text.*?>
 
 <VBox alignment="CENTER" prefHeight="400.0" prefWidth="400.0"
-  spacing="20.0" styleClass="background"
-  xmlns="http://javafx.com/javafx/11.0.14-internal">
-  <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true"
-    VBox.vgrow="ALWAYS"/>
+      spacing="40.0" styleClass="background"
+      xmlns="http://javafx.com/javafx/11.0.14-internal">
+    <ImageView fitHeight="100.0" fitWidth="100.0"
+               VBox.vgrow="ALWAYS">
+        <Image url="@../icon/icon.png"/>
+    </ImageView>
 
-  <Label alignment="CENTER" style="-fx-background-color: transparent;" styleClass="background"
-    text="Starting..." VBox.vgrow="ALWAYS">
-    <font>
-      <Font size="24.0"/>
-    </font>
-  </Label>
-  <ProgressIndicator prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
-  <padding>
-    <Insets bottom="50.0" left="50.0" right="50.0" top="50.0"/>
-  </padding>
+    <Label alignment="CENTER" style="-fx-background-color: transparent;" styleClass="background"
+           text="Starting..." VBox.vgrow="ALWAYS">
+        <font>
+            <Font size="24.0"/>
+        </font>
+    </Label>
+    <ProgressIndicator prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
+    <padding>
+        <Insets bottom="50.0" left="50.0" right="50.0" top="50.0"/>
+    </padding>
 </VBox>

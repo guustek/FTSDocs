@@ -9,6 +9,7 @@ import ftsdocs.view.ViewManagerImpl;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jfxtras.styles.jmetro.JMetro;
@@ -88,6 +89,7 @@ public class FTSDocsApplication extends Application {
     public void start(Stage primaryStage) throws IOException, InterruptedException {
         Platform.setImplicitExit(true);
         this.stage = primaryStage;
+        this.stage.getIcons().add(new Image(getClass().getResourceAsStream("/icon/icon.png")));
         this.stage.setTitle(APP_NAME);
         this.stage.initStyle(StageStyle.UNDECORATED);
         this.viewManager.changeScene(View.SPLASH);
@@ -123,6 +125,8 @@ public class FTSDocsApplication extends Application {
             splashStage.close();
 
             this.stage = new Stage();
+            this.stage.getIcons().add(new Image(getClass().getResourceAsStream("/icon/icon.png")));
+            this.stage.setTitle(APP_NAME);
             this.stage.initStyle(StageStyle.DECORATED);
             this.viewManager.changeScene(View.MAIN);
             this.stage.centerOnScreen();

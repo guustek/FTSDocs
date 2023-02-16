@@ -8,7 +8,7 @@
 <?import org.controlsfx.control.MasterDetailPane?>
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
 <?import org.fxmisc.richtext.InlineCssTextArea?>
-<BorderPane fx:id="root" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0"
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0"
             prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
     <left>
@@ -80,7 +80,7 @@
                                     <Tooltip text="Previous highlight"/>
                                 </tooltip>
                                 <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" focusTraversable="true"
+                                    <ImageView fitHeight="20.0" fitWidth="20.0"
                                                pickOnBounds="true" preserveRatio="true">
                                         <Image url="@../icon/light/previous_icon.png"/>
                                     </ImageView>
@@ -93,7 +93,7 @@
                                     <Tooltip text="Next highlight"/>
                                 </tooltip>
                                 <graphic>
-                                    <ImageView fitHeight="20" fitWidth="20" focusTraversable="true"
+                                    <ImageView fitHeight="20" fitWidth="20"
                                                pickOnBounds="true" preserveRatio="true">
                                         <Image url="@../icon/light/next_icon.png"/>
                                     </ImageView>
@@ -107,7 +107,7 @@
                                     <Tooltip text="Close preview"/>
                                 </tooltip>
                                 <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" focusTraversable="true"
+                                    <ImageView fitHeight="20.0" fitWidth="20.0"
                                                pickOnBounds="true" preserveRatio="true">
                                         <Image url="@../icon/light/close_icon.png"/>
                                     </ImageView>

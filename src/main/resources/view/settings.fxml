@@ -26,7 +26,7 @@
           <Insets bottom="22.0" top="9.0" />
         </VBox.margin>
       </Label>
-      <PropertySheet fx:id="propertySheet" mode="CATEGORY" focusTraversable="true" modeSwitcherVisible="false" VBox.vgrow="ALWAYS">
+      <PropertySheet fx:id="propertySheet" mode="CATEGORY" modeSwitcherVisible="false" VBox.vgrow="ALWAYS">
         <VBox.margin>
           <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
         </VBox.margin>

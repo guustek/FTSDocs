@@ -17,7 +17,7 @@
       </Policies>
       <DirectWriteRolloverStrategy>
         <Delete basePath="${LOG_DIR}" maxDepth="1">
-          <IfLastModified age="20s" />
+          <IfLastModified age="30d" />
         </Delete>
       </DirectWriteRolloverStrategy>
     </RollingFile>
