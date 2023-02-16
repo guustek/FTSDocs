@@ -1,4 +1,4 @@
-package ftsdocs.controls;
+package ftsdocs.view.controls;
 
 import javafx.beans.value.ObservableValue;
 

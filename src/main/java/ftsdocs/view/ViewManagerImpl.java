@@ -1,8 +1,8 @@
 package ftsdocs.view;
 
 import ftsdocs.FTSDocsApplication;
-import ftsdocs.configuration.Configuration;
 import ftsdocs.model.NotificationTitle;
+import ftsdocs.model.configuration.Configuration;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;

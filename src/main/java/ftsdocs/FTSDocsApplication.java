@@ -1,7 +1,7 @@
 package ftsdocs;
 
 import com.google.gson.*;
-import ftsdocs.configuration.Configuration;
+import ftsdocs.model.configuration.Configuration;
 import ftsdocs.server.FullTextSearchServer;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;

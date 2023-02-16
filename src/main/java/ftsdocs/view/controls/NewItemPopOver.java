@@ -1,4 +1,4 @@
-package ftsdocs.controls;
+package ftsdocs.view.controls;
 
 import java.io.IOException;
 import java.util.function.Consumer;

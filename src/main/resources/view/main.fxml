@@ -10,7 +10,7 @@
 <?import org.fxmisc.richtext.InlineCssTextArea?>
 <BorderPane fx:id="root" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0"
             prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.view.controller.MainController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MainController">
     <left>
         <fx:include source="menu.fxml"/>
     </left>

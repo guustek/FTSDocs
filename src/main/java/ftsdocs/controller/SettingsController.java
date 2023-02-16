@@ -1,13 +1,13 @@
-package ftsdocs.view.controller;
+package ftsdocs.controller;
 
-import ftsdocs.configuration.Category;
-import ftsdocs.configuration.Configuration;
-import ftsdocs.controls.BooleanPropertyEditor;
-import ftsdocs.controls.CheckComboBoxEditor;
 import ftsdocs.model.DocumentType;
-import ftsdocs.model.PropertyItem;
-import ftsdocs.service.FullTextSearchService;
+import ftsdocs.model.configuration.Category;
+import ftsdocs.model.configuration.Configuration;
 import ftsdocs.view.View;
+import ftsdocs.view.controls.BooleanPropertyEditor;
+import ftsdocs.view.controls.CheckComboBoxEditor;
+import ftsdocs.view.controls.PropertyItem;
+import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.ViewManager;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;

@@ -1,10 +1,10 @@
-package ftsdocs.view.controller;
+package ftsdocs.controller;
 
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.FileSystemUtils;
-import ftsdocs.configuration.Configuration;
-import ftsdocs.controls.FileContextMenu;
 import ftsdocs.model.Document;
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.view.controls.FileContextMenu;
 import ftsdocs.model.HighlightSnippet;
 import ftsdocs.model.NotificationTitle;
 import ftsdocs.service.FullTextSearchService;

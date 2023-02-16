@@ -1,11 +1,11 @@
-package ftsdocs.view.controller;
+package ftsdocs.controller;
 
-import ftsdocs.configuration.Configuration;
-import ftsdocs.controls.FileContextMenu;
 import ftsdocs.model.*;
+import ftsdocs.model.configuration.Configuration;
 import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.View;
 import ftsdocs.view.ViewManager;
+import ftsdocs.view.controls.FileContextMenu;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;

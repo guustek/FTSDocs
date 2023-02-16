@@ -1,11 +1,10 @@
-package ftsdocs.model;
-
-import java.util.Optional;
+package ftsdocs.view.controls;
 
 import javafx.beans.value.ObservableValue;
-
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.PropertyEditor;
+
+import java.util.Optional;
 
 public abstract class PropertyItem implements Item {
 

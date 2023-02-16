@@ -1,8 +1,7 @@
 package ftsdocs.view;
 
-import javafx.scene.Node;
-
 import ftsdocs.model.NotificationTitle;
+import javafx.scene.Node;
 
 public interface ViewManager {
 

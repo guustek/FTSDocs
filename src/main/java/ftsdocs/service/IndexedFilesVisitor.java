@@ -1,4 +1,8 @@
-package ftsdocs;
+package ftsdocs.service;
+
+import ftsdocs.model.configuration.Configuration;
+import io.methvin.watcher.visitor.FileTreeVisitor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -6,11 +10,6 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-
-import io.methvin.watcher.visitor.FileTreeVisitor;
-import lombok.extern.slf4j.Slf4j;
-
-import ftsdocs.configuration.Configuration;
 
 @Slf4j
 public class IndexedFilesVisitor implements FileTreeVisitor {

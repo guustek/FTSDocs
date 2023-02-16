@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox fx:id="root" spacing="20.0" styleClass="background" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.view.controller.MenuController">
+<VBox fx:id="root" spacing="20.0" styleClass="background" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.MenuController">
   <HBox alignment="CENTER">
     <VBox.margin>
       <Insets />

@@ -1,11 +1,11 @@
-package ftsdocs.view.controller;
+package ftsdocs.controller;
 
-import ftsdocs.configuration.Configuration;
 import ftsdocs.model.Document;
 import ftsdocs.model.IndexLocation;
 import ftsdocs.model.NotificationTitle;
-import ftsdocs.service.FullTextSearchService;
+import ftsdocs.model.configuration.Configuration;
 import ftsdocs.view.View;
+import ftsdocs.service.FullTextSearchService;
 import ftsdocs.view.ViewManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

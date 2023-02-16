@@ -2,8 +2,8 @@ package ftsdocs.service;
 
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.FileSystemUtils;
-import ftsdocs.configuration.Configuration;
 import ftsdocs.model.*;
+import ftsdocs.model.configuration.Configuration;
 import ftsdocs.server.FullTextSearchServer;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;

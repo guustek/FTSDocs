@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.view.controller.IndicesController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="900.0" styleClass="background" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ftsdocs.controller.IndicesController">
 
   <left>
     <fx:include source="menu.fxml" />

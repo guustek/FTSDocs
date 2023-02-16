@@ -1,10 +1,9 @@
 package ftsdocs.service;
 
-import ftsdocs.IndexedFilesVisitor;
-import ftsdocs.configuration.Configuration;
 import ftsdocs.model.IndexLocation;
 import ftsdocs.model.IndexStatus;
 import ftsdocs.model.WatcherStatus;
+import ftsdocs.model.configuration.Configuration;
 import io.methvin.watcher.DirectoryChangeEvent;
 import io.methvin.watcher.DirectoryChangeEvent.EventType;
 import io.methvin.watcher.DirectoryWatcher;

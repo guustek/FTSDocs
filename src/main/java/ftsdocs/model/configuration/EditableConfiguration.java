@@ -1,4 +1,4 @@
-package ftsdocs.configuration;
+package ftsdocs.model.configuration;
 
 import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.DocumentType;
