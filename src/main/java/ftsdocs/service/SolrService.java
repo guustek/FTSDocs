@@ -204,31 +204,6 @@ public class SolrService implements FullTextSearchService {
         }
     }
 
-    public void updateLocation(IndexLocation indexLocation, File file) {
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    indexLocation.setIndexStatus(IndexStatus.UPDATING);
-                    IndexLocation location = new IndexLocation(file, false);
-                    indexLocation.getIndexedFiles().add(location);
-                    Document document = contentExtractor.getDocumentFromFile(file);
-                    if (document != null) {
-                        location.setIndexStatus(IndexStatus.INDEXED);
-                        client.addBean(document);
-                        client.commit();
-                    } else {
-                        location.setIndexStatus(IndexStatus.FAILED);
-                    }
-                } catch (Exception e) {
-                    log.error("Error when updating {}", file, e);
-                }
-                return null;
-            }
-        };
-        executor.execute(task);
-    }
-
     @Override
     public void updateFileWatcher() {
         if (this.configuration.isEnableFileWatcher()) {

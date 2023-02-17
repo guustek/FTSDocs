@@ -1,28 +1,23 @@
 package ftsdocs.server;
 
-import java.io.File;
-import java.io.IOException;
-
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.ServerBeanCondition;
 import javafx.application.Platform;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.ServerBeanCondition;
+import java.io.File;
+import java.io.IOException;
 
 @Slf4j
 @Component
 @Lazy
 @Conditional(ServerBeanCondition.class)
 public class SolrEmbeddedServer extends SolrServer {
-
-    private EmbeddedSolrServer client;
 
     public SolrEmbeddedServer() {
         super();
@@ -59,9 +54,5 @@ public class SolrEmbeddedServer extends SolrServer {
             log.info("Interrupting " + Thread.currentThread().getName());
             Thread.currentThread().interrupt();
         }
-    }
-
-    public SolrClient getClient() {
-        return client;
     }
 }

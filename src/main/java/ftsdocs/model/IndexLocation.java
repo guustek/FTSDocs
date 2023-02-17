@@ -1,17 +1,16 @@
 package ftsdocs.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.LinkedList;
-
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
 @SuppressWarnings("java:S2065")
 public class IndexLocation {
-
 
     private final File root;
     private transient Collection<IndexLocation> indexedFiles;

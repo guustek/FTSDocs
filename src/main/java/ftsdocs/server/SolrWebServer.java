@@ -1,11 +1,8 @@
 package ftsdocs.server;
 
-import java.io.IOException;
-
+import ftsdocs.ServerBeanCondition;
 import javafx.application.Platform;
-
 import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.request.CoreAdminRequest;
@@ -16,7 +13,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import ftsdocs.ServerBeanCondition;
+import java.io.IOException;
 
 @Slf4j
 @Component
@@ -26,7 +23,6 @@ public class SolrWebServer extends SolrServer {
 
     private static final String BASE_URL = "http://localhost:8983/solr";
     private static final String SCRIPT_PATH = SOLR_DIR + "/bin/solr.cmd";
-    private SolrClient client;
 
     public SolrWebServer() {
         super();
@@ -62,11 +58,6 @@ public class SolrWebServer extends SolrServer {
             CoreAdminResponse response = request.process(baseClient);
             coreStatus = response.getCoreStatus(CORE_NAME);
         }
-    }
-
-    @Override
-    public SolrClient getClient() {
-        return client;
     }
 
     @Override

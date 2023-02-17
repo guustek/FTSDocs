@@ -1,11 +1,11 @@
 package ftsdocs.model;
 
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.solr.client.solrj.beans.Field;
+
+import java.util.Date;
 
 @NoArgsConstructor
 @Getter
