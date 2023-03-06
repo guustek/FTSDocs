@@ -47,7 +47,7 @@
             </ImageView>
         </graphic>
     </Button>
-    <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#indicesClick"
+    <Button alignment="TOP_LEFT"  focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#indicesClick"
             text="Indices">
         <VBox.margin>
             <Insets/>
@@ -58,7 +58,7 @@
             </ImageView>
         </graphic>
     </Button>
-    <Button alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#settingsClick"
+    <Button alignment="TOP_LEFT" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#settingsClick"
             text="Settings">
         <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -67,10 +67,10 @@
         </graphic>
     </Button>
     <Region VBox.vgrow="ALWAYS"/>
-    <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+    <Button alignment="CENTER" focusTraversable="false"  contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
             onMouseClicked="#indexFilesButtonClicked" text="Index files">
     </Button>
-    <Button alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+    <Button alignment="CENTER" focusTraversable="false" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
             onMouseClicked="#indexDirectoriesButtonClicked" text="Index directory">
     </Button>
     <BorderPane.margin>

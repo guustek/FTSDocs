@@ -7,6 +7,7 @@
   -fx-border-radius: 50px;
   -fx-background-radius: 50px;
   -fx-font-size: 15;
+  -fx-focus-traversable: false;
 }
 
 .button:disabled{
@@ -34,7 +35,7 @@
 .matches-box {
   -fx-border-color: rgb(233, 233, 233);
   -fx-border-width: 1.5px;
-  -fx-padding: 10px;
+  -fx-padding: 5px;
 }
 
 /* region notification */

@@ -1,18 +1,27 @@
 package ftsdocs.controller;
 
-import ftsdocs.model.*;
-import ftsdocs.model.configuration.Configuration;
-import ftsdocs.service.FullTextSearchService;
-import ftsdocs.view.View;
-import ftsdocs.view.ViewManager;
-import ftsdocs.view.controls.FileContextMenu;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.ResourceBundle;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +29,16 @@ import org.controlsfx.control.HyperlinkLabel;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.ResourceBundle;
+import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.NotificationTitle;
+import ftsdocs.model.WatcherStatus;
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.View;
+import ftsdocs.view.ViewManager;
+import ftsdocs.view.controls.FileContextMenu;
 
 @Slf4j
 @RequiredArgsConstructor

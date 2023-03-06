@@ -16,6 +16,7 @@
   -fx-border-radius: 50px;
   -fx-background-radius: 50px;
   -fx-font-size: 15;
+  -fx-focus-traversable: false;
 }
 
 .button:disabled{
