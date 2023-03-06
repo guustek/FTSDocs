@@ -1,18 +1,19 @@
 package ftsdocs.controller;
 
-import ftsdocs.model.Document;
-import ftsdocs.model.IndexLocation;
-import ftsdocs.model.NotificationTitle;
-import ftsdocs.model.configuration.Configuration;
-import ftsdocs.service.FullTextSearchService;
-import ftsdocs.view.View;
-import ftsdocs.view.ViewManager;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +21,13 @@ import org.controlsfx.control.HyperlinkLabel;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.NotificationTitle;
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.View;
+import ftsdocs.view.ViewManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,6 +47,7 @@ public class MenuController {
     private void indexFilesButtonClicked() {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(getExtensionFilters());
+        chooser.setSelectedExtensionFilter(chooser.getExtensionFilters().get(1));
         List<File> files = chooser
                 .showOpenMultipleDialog(this.root.getScene().getWindow());
         if (files != null) {

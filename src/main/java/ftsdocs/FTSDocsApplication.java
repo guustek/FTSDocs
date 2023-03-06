@@ -1,26 +1,13 @@
 package ftsdocs;
 
-import com.google.gson.*;
-import ftsdocs.model.configuration.Configuration;
-import ftsdocs.server.FullTextSearchServer;
-import ftsdocs.view.View;
-import ftsdocs.view.ViewManager;
-import ftsdocs.view.ViewManagerImpl;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.scene.image.Image;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import jfxtras.styles.jmetro.JMetro;
-import jfxtras.styles.jmetro.Style;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SystemUtils;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-
+import java.awt.AWTException;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -31,6 +18,36 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import jfxtras.styles.jmetro.JMetro;
+import jfxtras.styles.jmetro.Style;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.server.FullTextSearchServer;
+import ftsdocs.view.View;
+import ftsdocs.view.ViewManager;
+import ftsdocs.view.ViewManagerImpl;
 
 @Slf4j
 @ComponentScan
@@ -141,9 +158,72 @@ public class FTSDocsApplication extends Application {
                 this.configuration.setHeight((Double) newValue);
                 this.configuration.writeToFile();
             });
+
+            if (SystemTray.isSupported()) {
+                setupTray();
+            } else {
+                stage.setOnCloseRequest(e -> Platform.exit());
+            }
+
         });
+
         Thread thread = new Thread(task, "Server startup thread");
         thread.start();
+    }
+
+    private void setupTray() {
+        try {
+            Platform.setImplicitExit(false);
+            final var systemTray = SystemTray.getSystemTray();
+
+            final var trayIconImage = Toolkit.getDefaultToolkit()
+                    .getImage(getClass().getResource("/icon/icon.png"));
+            final var trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+            final var trayIcon = new TrayIcon(
+                    trayIconImage.getScaledInstance(trayIconWidth, -1,
+                            java.awt.Image.SCALE_SMOOTH),
+                    APP_NAME);
+            trayIcon.setImageAutoSize(true);
+            trayIcon.setToolTip(APP_NAME);
+            trayIcon.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(final MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        Platform.runLater(() -> {
+                            if (stage.isIconified()) {
+                                stage.setIconified(false);
+                            }
+                            stage.show();
+                            stage.toFront();
+                        });
+                    }
+                }
+            });
+            systemTray.add(trayIcon);
+
+            PopupMenu popupMenu = new PopupMenu();
+
+            MenuItem open = new MenuItem("Open");
+            open.addActionListener(e -> Platform.runLater(() -> {
+                if (stage.isIconified()) {
+                    stage.setIconified(false);
+                }
+                stage.show();
+                stage.toFront();
+            }));
+
+            MenuItem exit = new MenuItem("Exit");
+            exit.addActionListener(e -> Platform.exit());
+
+            popupMenu.add(open);
+            popupMenu.add(exit);
+
+            trayIcon.setPopupMenu(popupMenu);
+
+            stage.setOnCloseRequest(e -> stage.hide());
+        } catch (AWTException e) {
+            stage.setOnCloseRequest(ev-> Platform.exit());
+        }
     }
 
     private Configuration loadConfiguration() {
