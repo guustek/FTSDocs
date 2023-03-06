@@ -81,7 +81,6 @@ public class DirectoryWatcherManager {
         }
     }
 
-    // TODO: 29.01.2023 NEED TO TEST THIS BULLSHIT
     private void handleFileChangeEvent(Path sourcePath, DirectoryChangeEvent event) {
         if (!shouldHandleFileSystemEvent(sourcePath, event)) {
             return;
