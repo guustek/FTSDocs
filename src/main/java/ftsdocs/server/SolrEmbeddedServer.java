@@ -1,8 +1,10 @@
 package ftsdocs.server;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.ServerBeanCondition;
+import java.io.File;
+import java.io.IOException;
+
 import javafx.application.Platform;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
@@ -10,8 +12,8 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.IOException;
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.ServerBeanCondition;
 
 @Slf4j
 @Component
@@ -29,7 +31,7 @@ public class SolrEmbeddedServer extends SolrServer {
             log.info("Starting Solr embedded server");
             log.info("Loading core");
             CoreContainer coreContainer = CoreContainer.createAndLoad(
-                    new File(FTSDocsApplication.HOME_DIR, SOLR_DIR + "/server/solr").toPath());
+                    new File(FTSDocsApplication.HOME_DIR, SERVER_DIR + "/solr").toPath());
             log.info("Core loaded");
             this.client = new EmbeddedSolrServer(coreContainer, CORE_NAME);
             log.info("Solr embedded server started");

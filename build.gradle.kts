@@ -12,7 +12,6 @@ java {
 }
 
 group = "ftsdocs"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -48,7 +47,6 @@ dependencies {
 javafx {
     version = "17"
     modules("javafx.controls", "javafx.fxml")
-//    configuration = "compileOnly"
 }
 
 application {
@@ -61,9 +59,22 @@ tasks.jar {
     }
     from({ configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    exclude("META-INF/*.RSA")
-    exclude("META-INF/*.SF")
-    exclude("META-INF/*.DSA")
+    from(configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) })
+
+    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+    finalizedBy(tasks.named("copyJar"))
+}
+
+tasks.clean {
+    delete("bin")
+}
+
+tasks.register<Copy>("copyJar") {
+    delete("bin")
+    from("build/libs/FTSDocs.jar")
+    into("bin")
+    include("*.jar")
+    dependsOn(tasks.jar)
 }
 
 tasks.test {

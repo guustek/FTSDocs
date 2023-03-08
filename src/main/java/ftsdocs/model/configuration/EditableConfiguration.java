@@ -69,7 +69,7 @@ public abstract class EditableConfiguration {
 
     public void reset() {
         this.enableDarkMode = false;
-        this.highlightColor = Color.rgb(0, 120, 215);
+        this.highlightColor = Color.rgb(54, 215, 0);
         this.contentFontSize = 14;
 
         this.enableSynonymSearch = false;

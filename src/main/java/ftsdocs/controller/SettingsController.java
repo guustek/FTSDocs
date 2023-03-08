@@ -1,29 +1,31 @@
 package ftsdocs.controller;
 
-import ftsdocs.model.DocumentType;
-import ftsdocs.model.configuration.Category;
-import ftsdocs.model.configuration.Configuration;
-import ftsdocs.view.View;
-import ftsdocs.view.controls.BooleanPropertyEditor;
-import ftsdocs.view.controls.CheckComboBoxEditor;
-import ftsdocs.view.controls.PropertyItem;
-import ftsdocs.service.FullTextSearchService;
-import ftsdocs.view.ViewManager;
+import java.net.URL;
+import java.util.Collection;
+import java.util.ResourceBundle;
+import java.util.Set;
+
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.paint.Color;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.PropertySheet;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.ResourceBundle;
-import java.util.Set;
+import ftsdocs.model.DocumentType;
+import ftsdocs.model.configuration.Category;
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.service.FullTextSearchService;
+import ftsdocs.view.View;
+import ftsdocs.view.ViewManager;
+import ftsdocs.view.controls.BooleanPropertyEditor;
+import ftsdocs.view.controls.CheckComboBoxEditor;
+import ftsdocs.view.controls.PropertyItem;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,14 +66,16 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void applyClick() {
-        boolean shouldReloadView = configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
-        boolean shouldUpdateFileWatcher = configuration.isEnableFileWatcher() != tempConfiguration.isEnableFileWatcher();
+        boolean shouldReloadView =
+                configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
+        boolean shouldUpdateFileWatcher =
+                configuration.isEnableFileWatcher() != tempConfiguration.isEnableFileWatcher();
         configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
-        if(shouldReloadView){
+        if (shouldReloadView) {
             viewManager.changeScene(View.SETTINGS);
         }
-        if(shouldUpdateFileWatcher){
+        if (shouldUpdateFileWatcher) {
             ftsService.updateFileWatcher();
         }
     }
@@ -157,7 +161,10 @@ public class SettingsController implements Initializable {
         propertySheet.getItems().add(new PropertyItem(
                 boolean.class,
                 "Enable suggestions",
-                "Enables display of autocompletion suggestions of possible search phrases",
+                """
+                        Enables display of autocompletion suggestions of possible search phrases.
+                        Does not work when there is document larger than 32 KB indexed.
+                        """,
                 Category.SEARCHING.getDisplayName(),
                 BooleanPropertyEditor.class) {
             @Override
@@ -215,9 +222,8 @@ public class SettingsController implements Initializable {
                         "Enable file watcher",
                         """
                                 Enable/disable automatic updates of indices based on file system events.
-                                Improves performance if disabled
+                                Improves performance if disabled.
                                 Disable it if indexed locations and files are not expected to be modified after indexing.
-                                Changes will apply after application restart
                                 """,
                         Category.INDEXING.getDisplayName(),
                         BooleanPropertyEditor.class) {

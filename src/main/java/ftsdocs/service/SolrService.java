@@ -1,13 +1,26 @@
 package ftsdocs.service;
 
-import ftsdocs.FTSDocsApplication;
-import ftsdocs.FileSystemUtils;
-import ftsdocs.model.*;
-import ftsdocs.model.configuration.Configuration;
-import ftsdocs.server.FullTextSearchServer;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.solr.client.solrj.SolrClient;
@@ -19,18 +32,22 @@ import org.apache.solr.client.solrj.response.SuggesterResponse;
 import org.apache.solr.client.solrj.response.Suggestion;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.CursorMarkParams;
+import org.apache.solr.search.SyntaxError;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import ftsdocs.FTSDocsApplication;
+import ftsdocs.FileSystemUtils;
+import ftsdocs.model.Document;
+import ftsdocs.model.FieldName;
+import ftsdocs.model.IndexLocation;
+import ftsdocs.model.IndexStatus;
+import ftsdocs.model.NotificationTitle;
+import ftsdocs.model.WatcherStatus;
+import ftsdocs.model.configuration.Configuration;
+import ftsdocs.server.FullTextSearchServer;
+import ftsdocs.view.ViewManager;
 
 @Slf4j
 @Service
@@ -39,6 +56,7 @@ public class SolrService implements FullTextSearchService {
 
     private final SolrClient client;
     private final ContentExtractor contentExtractor;
+    private final ViewManager viewManager;
     private final ExecutorService executor;
     private final Configuration configuration;
     private DirectoryWatcherManager watcherManager;
@@ -52,9 +70,11 @@ public class SolrService implements FullTextSearchService {
     public SolrService(
             ContentExtractor contentExtractor,
             FullTextSearchServer server,
+            ViewManager viewManager,
             Configuration configuration) {
         this.client = server.getClient();
         this.contentExtractor = contentExtractor;
+        this.viewManager = viewManager;
         this.configuration = configuration;
         this.executor = Executors.newCachedThreadPool(
                 new CustomizableThreadFactory("Indexing thread-"));
@@ -82,7 +102,8 @@ public class SolrService implements FullTextSearchService {
             for (Document document : documents) {
                 Map<String, List<String>> highlightsForPath = highlighting.get(document.getPath());
                 List<String> highlightsForField = highlightsForPath.getOrDefault(
-                        configuration.isEnableSynonymSearch() ? FieldName.CONTENT_SYNONYMS : FieldName.CONTENT,
+                        configuration.isEnableSynonymSearch() ? FieldName.CONTENT_SYNONYMS
+                                : FieldName.CONTENT,
                         Collections.singletonList(null));
                 document.setHighlight(highlightsForField.get(0));
             }
@@ -90,13 +111,16 @@ public class SolrService implements FullTextSearchService {
         } catch (Exception e) {
             log.error("Error while searching with query: {}",
                     FTSDocsApplication.GSON.toJson(solrQuery.toString()), e);
+            if (e.getCause() instanceof SyntaxError syntaxError) {
+                viewManager.showNotification(NotificationTitle.ERROR, syntaxError.getMessage(), null);
+            }
+
         }
         return documents;
     }
 
     @Override
     public Collection<String> getSuggestions(String searchPhrase) {
-        //String suggesterName = configuration.isEnableSynonymSearch() ? "suggester_synonyms" : "suggester";
         String suggesterName = "suggester";
         SolrQuery query = new SolrQuery()
                 .setRequestHandler("/suggest")
@@ -107,7 +131,8 @@ public class SolrService implements FullTextSearchService {
         try {
             QueryResponse response = this.client.query(query);
             SuggesterResponse suggesterResponse = response.getSuggesterResponse();
-            List<Suggestion> suggestions = suggesterResponse.getSuggestions().getOrDefault(suggesterName, List.of());
+            List<Suggestion> suggestions = suggesterResponse.getSuggestions()
+                    .getOrDefault(suggesterName, List.of());
             suggestions.forEach(
                     suggestion -> result.addAll(extractTermsFromHighlights(suggestion.getTerm())));
         } catch (SolrServerException | IOException e) {
@@ -200,7 +225,8 @@ public class SolrService implements FullTextSearchService {
                                     .toList()));
             this.watcherManager.updateWatchers(locations);
         } else {
-            configuration.getIndexedLocations().values().forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
+            configuration.getIndexedLocations().values()
+                    .forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
         }
     }
 
@@ -213,7 +239,8 @@ public class SolrService implements FullTextSearchService {
             this.watcherManager.updateWatchers(this.configuration.getIndexedLocations().values());
         } else {
             this.watcherManager = null;
-            this.configuration.getIndexedLocations().values().forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
+            this.configuration.getIndexedLocations().values()
+                    .forEach(loc -> loc.setWatcherStatus(WatcherStatus.DISABLED));
         }
     }
 
@@ -224,6 +251,7 @@ public class SolrService implements FullTextSearchService {
                 log.info("{} started updating task", Thread.currentThread().getName());
                 Collection<IndexLocation> actualFiles = configuration.getIndexedLocations().values()
                         .parallelStream()
+                        .filter(location -> location.getRoot().exists())
                         .flatMap(location -> {
                             location.setIndexStatus(IndexStatus.UPDATING);
                             Collection<IndexLocation> files = extractChildLocations(location);
@@ -271,7 +299,8 @@ public class SolrService implements FullTextSearchService {
                 }
                 cursorMark = nextCursorMark;
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            log.error("Error when deleting non existent files from index",e);
         }
 
         List<Path> toBeDeleted = allIndexedDocs.stream()
@@ -354,8 +383,6 @@ public class SolrService implements FullTextSearchService {
                 .setParam(CommonParams.DF, configuration.isEnableSynonymSearch()
                         ? FieldName.CONTENT_SYNONYMS
                         : FieldName.CONTENT)
-                //.setParam(CommonParams.FL, "*", "score")
-                //.setParam(HighlightParams.SCORE_K1, "0")
                 .setHighlight(true)
                 .setHighlightFragsize(0)
                 .setHighlightSnippets(this.configuration.getMaxPhraseHighlights())

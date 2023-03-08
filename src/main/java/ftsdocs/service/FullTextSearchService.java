@@ -1,12 +1,13 @@
 package ftsdocs.service;
 
-import ftsdocs.model.Document;
-import ftsdocs.model.IndexLocation;
+import java.nio.file.Path;
+import java.util.Collection;
+
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 
-import java.nio.file.Path;
-import java.util.Collection;
+import ftsdocs.model.Document;
+import ftsdocs.model.IndexLocation;
 
 public interface FullTextSearchService {
 

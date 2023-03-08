@@ -266,7 +266,7 @@
                 of heap space per Solr core.
     -->
     <updateLog>
-      <str name="dir">${solr.ulog.dir:}</str>
+      <str name="dir">tlog</str>
       <int name="numVersionBuckets">${solr.ulog.numVersionBuckets:65536}</int>
     </updateLog>
 

@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.Set;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -39,6 +40,7 @@ import jfxtras.styles.jmetro.Style;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -78,7 +80,8 @@ public class FTSDocsApplication extends Application {
     }
 
     @Override
-    public void init() {
+    public void init()  {
+        Set<String> strings = StandardTokenizerFactory.availableTokenizers();
         log.info("Starting application at {} on host: {}",
                 DATE_TIME_FORMATTER.format(Instant.now()), SystemUtils.getHostName());
         log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
