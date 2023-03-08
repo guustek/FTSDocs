@@ -9,12 +9,12 @@
 
     <fieldType name="text_general_synonyms" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-        <tokenizer name="standard"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
       <analyzer type="query">
-        <tokenizer name="standard"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.SynonymFilterFactory" expand="true" ignoreCase="true"
@@ -24,12 +24,12 @@
 
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-        <tokenizer name="standard"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
       <analyzer type="query">
-        <tokenizer name="standard"/>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.StopFilterFactory" words="lang/stopwords/stopwords_pl.txt" ignoreCase="true"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>

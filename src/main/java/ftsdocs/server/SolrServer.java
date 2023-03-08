@@ -41,7 +41,6 @@ public abstract class SolrServer implements FullTextSearchServer {
                 copyResourceToFile(solrResource + "core/core.properties", new File(coreDir, "core.properties"));
 
                 copyResourceToFile(solrResource + "core/conf/schema.xml", new File(coreConfDir, "schema.xml"));
-                copyResourceToFile(solrResource + "core/conf/managed-schema.xml", new File(coreConfDir, "managed-schema.xml"));
                 copyResourceToFile(solrResource + "core/conf/solrconfig.xml", new File(coreConfDir, "solrconfig.xml"));
                 copyResourceToFile(solrResource + "core/conf/lang/stopwords/stopwords_pl.txt", new File(stopwordsDir, "stopwords_pl.txt"));
                 copyResourceToFile(solrResource + "core/conf/lang/synonyms/synonyms_pl.txt", new File(synonymsDir, "synonyms_pl.txt"));

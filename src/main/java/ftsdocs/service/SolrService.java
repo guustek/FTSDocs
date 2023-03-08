@@ -112,7 +112,8 @@ public class SolrService implements FullTextSearchService {
             log.error("Error while searching with query: {}",
                     FTSDocsApplication.GSON.toJson(solrQuery.toString()), e);
             if (e.getCause() instanceof SyntaxError syntaxError) {
-                viewManager.showNotification(NotificationTitle.ERROR, syntaxError.getMessage(), null);
+                viewManager.showNotification(NotificationTitle.ERROR, syntaxError.getMessage(),
+                        null);
             }
 
         }
@@ -144,20 +145,13 @@ public class SolrService implements FullTextSearchService {
     private List<String> extractTermsFromHighlights(String term) {
         List<String> highlightedWords = new ArrayList<>();
         Matcher matcher = SUGGESTION_HIGHLIGHT_PATTERN.matcher(term);
-
         while (matcher.find()) {
             String highlighted = matcher.group(1);
             int start = matcher.end();
-            Set<Character> wordEndCharacters = Set.of(
-                    ' ',
-                    '\n',
-                    '\r',
-                    '.',
-                    ','
-            );
             int end = start;
             for (; end < term.length(); end++) {
-                if (wordEndCharacters.contains(term.charAt(end))) {
+                char c = term.charAt(end);
+                if (Character.isWhitespace(c) || c == (char) 160) {
                     break;
                 }
             }
@@ -300,7 +294,7 @@ public class SolrService implements FullTextSearchService {
                 cursorMark = nextCursorMark;
             }
         } catch (Exception e) {
-            log.error("Error when deleting non existent files from index",e);
+            log.error("Error when deleting non existent files from index", e);
         }
 
         List<Path> toBeDeleted = allIndexedDocs.stream()
