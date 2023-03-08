@@ -172,12 +172,12 @@ public class FTSDocsApplication extends Application {
         if (this.configuration.isMinimizeOnClose() && SystemTray.isSupported()) {
             try {
                 Platform.setImplicitExit(false);
-                final var systemTray = SystemTray.getSystemTray();
+                SystemTray systemTray = SystemTray.getSystemTray();
 
-                final var trayIconImage = Toolkit.getDefaultToolkit()
+                java.awt.Image trayIconImage = Toolkit.getDefaultToolkit()
                         .getImage(getClass().getResource("/icon/icon.png"));
-                final var trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
-                final var trayIcon = new TrayIcon(
+                int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+                TrayIcon trayIcon = new TrayIcon(
                         trayIconImage.getScaledInstance(trayIconWidth, -1,
                                 java.awt.Image.SCALE_SMOOTH),
                         APP_NAME);

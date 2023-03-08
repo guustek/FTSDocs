@@ -12,6 +12,7 @@
     <li>
         Uruchom polecenie <b>./gradlew run</b> (Linux) lub <b>gradlew run</b> (Windows). 
         Przy pierwszym uruchomieniu zostanie pobrana odpowiednia wersja Gradle oraz potrzebne zależności, a następnie uruchomi się aplikacja.
+        Jeśli polecenie na systemie Linux zwraca błąd "./gradlew: command not found" należy dodać pozwolenie na wykonywanie pliku poprzez komendę <b>chmod +x gradlew</b>.
     </li>
 </ol>
 
