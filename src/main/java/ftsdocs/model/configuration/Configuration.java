@@ -1,14 +1,15 @@
 package ftsdocs.model.configuration;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.google.gson.annotations.JsonAdapter;
-import ftsdocs.model.IndexLocation;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ConcurrentHashMap;
+import ftsdocs.model.IndexLocation;
 
 @Slf4j
 @Component

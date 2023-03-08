@@ -1,7 +1,6 @@
 package ftsdocs.model.configuration;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -9,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javafx.scene.paint.Color;
 
+import com.google.gson.annotations.JsonAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +35,10 @@ public abstract class EditableConfiguration {
     );
 
     //region Appearance
-
+    private boolean minimizeOnClose;
     private boolean enableDarkMode;
 
+    @JsonAdapter(ColorAdapter.class)
     private Color highlightColor;
 
     private int contentFontSize;
@@ -68,6 +69,7 @@ public abstract class EditableConfiguration {
     }
 
     public void reset() {
+        this.minimizeOnClose = true;
         this.enableDarkMode = false;
         this.highlightColor = Color.rgb(54, 215, 0);
         this.contentFontSize = 14;
@@ -82,6 +84,7 @@ public abstract class EditableConfiguration {
     }
 
     public void copyFrom(EditableConfiguration configuration) {
+        this.minimizeOnClose = configuration.isMinimizeOnClose();
         this.enableDarkMode = configuration.isEnableDarkMode();
         this.highlightColor = configuration.getHighlightColor();
         this.contentFontSize = configuration.getContentFontSize();
@@ -109,8 +112,8 @@ public abstract class EditableConfiguration {
             Files.writeString(
                     FTSDocsApplication.CONFIG_FILE.toPath(),
                     FTSDocsApplication.GSON.toJson(this));
-        } catch (IOException | IllegalAccessException e) {
-            log.info("Encountered an error when writing configuration into config.json file");
+        } catch (Exception e) {
+            log.error("Encountered an error when writing configuration into config.json file",e);
         }
     }
 }

@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Arrays;
 import java.util.Locale;
 
 import javafx.application.Application;
@@ -74,11 +75,12 @@ public class FTSDocsApplication extends Application {
     private Configuration configuration;
 
     public static void main(String[] args) {
+        log.info("Launching with arguments: {}", Arrays.asList(args));
         launch(args);
     }
 
     @Override
-    public void init()  {
+    public void init() {
         log.info("Starting application at {} on host: {}",
                 DATE_TIME_FORMATTER.format(Instant.now()), SystemUtils.getHostName());
         log.info("JAVA_HOME: {}", SystemUtils.getJavaHome());
@@ -90,6 +92,7 @@ public class FTSDocsApplication extends Application {
         this.context = new AnnotationConfigApplicationContext(getClass());
 
         this.context.getBeanFactory().registerSingleton("configuration", loadConfiguration());
+        this.context.getBeanFactory().registerSingleton("application", this);
         this.configuration = this.context.getBean(Configuration.class);
 
         this.viewManager = new ViewManagerImpl(this, configuration);
@@ -158,72 +161,73 @@ public class FTSDocsApplication extends Application {
                 this.configuration.setHeight((Double) newValue);
                 this.configuration.writeToFile();
             });
-
-            if (SystemTray.isSupported()) {
-                setupTray();
-            } else {
-                stage.setOnCloseRequest(e -> Platform.exit());
-            }
-
+            setupTray();
         });
 
         Thread thread = new Thread(task, "Server startup thread");
         thread.start();
     }
 
-    private void setupTray() {
-        try {
-            Platform.setImplicitExit(false);
-            final var systemTray = SystemTray.getSystemTray();
+    public void setupTray() {
+        if (this.configuration.isMinimizeOnClose() && SystemTray.isSupported()) {
+            try {
+                Platform.setImplicitExit(false);
+                final var systemTray = SystemTray.getSystemTray();
 
-            final var trayIconImage = Toolkit.getDefaultToolkit()
-                    .getImage(getClass().getResource("/icon/icon.png"));
-            final var trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
-            final var trayIcon = new TrayIcon(
-                    trayIconImage.getScaledInstance(trayIconWidth, -1,
-                            java.awt.Image.SCALE_SMOOTH),
-                    APP_NAME);
-            trayIcon.setImageAutoSize(true);
-            trayIcon.setToolTip(APP_NAME);
-            trayIcon.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(final MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
-                        Platform.runLater(() -> {
-                            if (stage.isIconified()) {
-                                stage.setIconified(false);
-                            }
-                            stage.show();
-                            stage.toFront();
-                        });
+                final var trayIconImage = Toolkit.getDefaultToolkit()
+                        .getImage(getClass().getResource("/icon/icon.png"));
+                final var trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+                final var trayIcon = new TrayIcon(
+                        trayIconImage.getScaledInstance(trayIconWidth, -1,
+                                java.awt.Image.SCALE_SMOOTH),
+                        APP_NAME);
+                trayIcon.setImageAutoSize(true);
+                trayIcon.setToolTip(APP_NAME);
+                trayIcon.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(final MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            Platform.runLater(() -> {
+                                if (stage.isIconified()) {
+                                    stage.setIconified(false);
+                                }
+                                stage.show();
+                                stage.toFront();
+                            });
+                        }
                     }
-                }
-            });
-            systemTray.add(trayIcon);
+                });
+                systemTray.add(trayIcon);
 
-            PopupMenu popupMenu = new PopupMenu();
+                PopupMenu popupMenu = new PopupMenu();
 
-            MenuItem open = new MenuItem("Open");
-            open.addActionListener(e -> Platform.runLater(() -> {
-                if (stage.isIconified()) {
-                    stage.setIconified(false);
-                }
-                stage.show();
-                stage.toFront();
-            }));
+                MenuItem open = new MenuItem("Open");
+                open.addActionListener(e -> Platform.runLater(() -> {
+                    if (stage.isIconified()) {
+                        stage.setIconified(false);
+                    }
+                    stage.show();
+                    stage.toFront();
+                }));
 
-            MenuItem exit = new MenuItem("Exit");
-            exit.addActionListener(e -> Platform.exit());
+                MenuItem exit = new MenuItem("Exit");
+                exit.addActionListener(e -> Platform.exit());
 
-            popupMenu.add(open);
-            popupMenu.add(exit);
+                popupMenu.add(open);
+                popupMenu.add(exit);
 
-            trayIcon.setPopupMenu(popupMenu);
+                trayIcon.setPopupMenu(popupMenu);
 
-            stage.setOnCloseRequest(e -> stage.hide());
-        } catch (AWTException e) {
-            stage.setOnCloseRequest(ev-> Platform.exit());
+                stage.setOnCloseRequest(e -> stage.hide());
+            } catch (AWTException e) {
+                stage.setOnCloseRequest(ev -> Platform.exit());
+            }
+        } else {
+            Platform.setImplicitExit(true);
+            stage.setOnCloseRequest(e -> Platform.exit());
         }
+
+
     }
 
     private Configuration loadConfiguration() {

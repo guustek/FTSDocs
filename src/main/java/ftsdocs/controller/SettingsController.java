@@ -17,6 +17,7 @@ import org.controlsfx.control.PropertySheet;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import ftsdocs.FTSDocsApplication;
 import ftsdocs.model.DocumentType;
 import ftsdocs.model.configuration.Category;
 import ftsdocs.model.configuration.Configuration;
@@ -39,6 +40,8 @@ public class SettingsController implements Initializable {
     private final Configuration configuration;
 
     private Configuration tempConfiguration;
+
+    private final FTSDocsApplication application;
 
     private final ViewManager viewManager;
 
@@ -70,6 +73,7 @@ public class SettingsController implements Initializable {
                 configuration.isEnableDarkMode() != tempConfiguration.isEnableDarkMode();
         boolean shouldUpdateFileWatcher =
                 configuration.isEnableFileWatcher() != tempConfiguration.isEnableFileWatcher();
+       boolean shouldReloadTray = configuration.isMinimizeOnClose() != tempConfiguration.isMinimizeOnClose();
         configuration.copyFrom(tempConfiguration);
         configuration.writeToFile();
         if (shouldReloadView) {
@@ -78,12 +82,33 @@ public class SettingsController implements Initializable {
         if (shouldUpdateFileWatcher) {
             ftsService.updateFileWatcher();
         }
+        if (shouldReloadTray) {
+            application.setupTray();
+        }
     }
 
     @SuppressWarnings("java:S2696")
     private void initializeProperties() {
 
         //region Appearance
+
+        this.propertySheet.getItems()
+                .add(new PropertyItem(
+                        boolean.class,
+                        "Enable minimizing on close",
+                        "Will minimize application when closed.",
+                        Category.APPEARANCE.getDisplayName(),
+                        BooleanPropertyEditor.class) {
+                    @Override
+                    public Object getValue() {
+                        return tempConfiguration.isMinimizeOnClose();
+                    }
+
+                    @Override
+                    public void setValue(Object value) {
+                        tempConfiguration.setMinimizeOnClose((boolean) value);
+                    }
+                });
 
         this.propertySheet.getItems()
                 .add(new PropertyItem(

@@ -51,18 +51,9 @@ javafx {
 
 application {
     mainClass.set("ftsdocs.Launcher")
-}
-
-tasks.jar {
-    manifest {
-        attributes["Main-Class"] = "ftsdocs.Launcher"
-    }
-    from({ configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } })
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) })
-
-    exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
-    finalizedBy(tasks.named("copyJar"))
+    applicationDefaultJvmArgs = listOf(
+        "--add-opens", "javafx.graphics/javafx.scene.paint=ALL-UNNAMED",
+        "--add-opens", "javafx.base/com.sun.javafx.event=ALL-UNNAMED")
 }
 
 tasks.clean {
